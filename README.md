@@ -1,7 +1,7 @@
 # Python connector for SQream DB V2
 
 * **Author:** Daniel Gutman
-* **Version:** 1.0
+* **Version:** 1.0.0
 * **Supported SQream DB versions:** >= V2 Blue Cloud
 
 The Python connector for SQream DB is a Python DB API 2.0-compliant interface for developing Python applications with SQream DB.
