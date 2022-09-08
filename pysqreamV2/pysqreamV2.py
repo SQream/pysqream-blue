@@ -1,6 +1,6 @@
 import time
 from datetime import datetime, date, time as t
-from connection import Connection
+from connection import Connection, qh_messages
 
 
 def connect(host:      str =  '127.0.0.1',
@@ -79,17 +79,16 @@ threadsafety = 1 # Threads can share the module but not a connection
 paramstyle = 'qmark'
 
 
-#if __name__ == '__main__':
-#     connector = connect(host='192.168.4.4', database='master')
+# if __name__ == '__main__':
+#     con = connect(host='192.168.4.4', database='master')
 #     query = None
 #     while (True):
-#         cursor = connector.cursor()
-#         query = input(f'{cursor.database}=> ')
+#         cursor = con.cursor()
+#         query = input(f'{con.database}=> ')
 #         if '\q' == query:
 #             break
 #         try:
 #             cursor.execute(query)
-#             print(qh_messages.QueryExecutionStatus.Name(cursor.stmt_status).replace('_', ' ').title())
 #             if cursor.query_type == qh_messages.QUERY_TYPE_QUERY:
 #                 print(*(desc[0] for desc in cursor.description), sep=', ')
 #                 print(*cursor.fetchall() or [], sep="\n")
@@ -97,4 +96,4 @@ paramstyle = 'qmark'
 #         except Exception as e:
 #             print(e)
 #         cursor.close()
-#     connector.close()
+#     con.close()

@@ -1,0 +1,7 @@
+__pycache__/*
+__pycache__/
+test_log
+pytest_html_report.html
+output.json
+tests/archive/*
+.idea/
