@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package com.sqream.cloud.generated.v1;
+
+option java_multiple_files = true;
+
+message ClientInfo { string version = 1; }

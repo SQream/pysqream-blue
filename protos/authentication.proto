@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package com.sqream.cloud.generated.v1;
+
+option java_multiple_files = true;
+
+import "protos/error.proto";
+import "protos/client_info.proto";
+
+service AuthenticationService { rpc Auth(AuthRequest) returns (AuthResponse); }
+
+message AuthRequest {
+  string user = 1;
+  string password = 2;
+  string tenant_id = 3;
+  string database = 4;
+  string source_ip = 5;
+  ClientInfo client_info = 6;
+  map<string, string> client_params = 7;
+}
+
+message AuthResponse {
+  string token = 1;
+  string token_type = 2;
+  int64 exp_time = 3;
+  string context_id = 4;
+  Error error = 5;
+  string sqream_version = 6;
+}

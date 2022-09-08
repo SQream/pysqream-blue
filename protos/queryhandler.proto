@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package com.sqream.cloud.generated.v1;
+
+import "protos/error.proto";
+
+option java_multiple_files = true;
+
+service QueryHandlerService {
+  rpc Compile(CompileRequest) returns (CompileResponse);
+  rpc Execute(ExecuteRequest) returns (ExecuteResponse);
+  rpc Status(StatusRequest) returns (StatusResponse);
+  rpc Fetch(FetchRequest) returns (FetchResponse);
+  rpc CloseStatement(CloseStatementRequest) returns (CloseStatementResponse);
+  rpc Cancel(CancelRequest) returns (CancelResponse);
+  rpc CloseSession(CloseSessionRequest) returns (CloseSessionResponse);
+}
+
+message CompileRequest {
+  string context_id = 1;
+  bytes sql = 2;
+  string encoding = 3;
+  int64 query_timeout = 4;
+}
+
+message CompileResponse {
+  string context_id = 1;
+  repeated ColumnMetadata columns = 2;
+  QueryType query_type = 3;
+  Error error = 4;
+}
+
+message StatusRequest { string context_id = 1; }
+
+message StatusResponse {
+  QueryExecutionStatus status = 1;
+  Error error = 2;
+}
+
+message ExecuteRequest { string context_id = 1; }
+
+message ExecuteResponse {
+  string context_id = 1;
+  Error error = 2;
+}
+
+message ColumnMetadata {
+  ColumnType type = 1;
+  bool nullable = 2;
+  bool tru_varchar = 3;
+  string name = 4;
+  int64 value_size = 5;
+  int32 scale = 6;
+  int32 precision = 7;
+}
+
+message FetchRequest { string context_id = 1; }
+
+message FetchResponse {
+  bytes query_result = 1;
+  Error error = 2;
+}
+
+message CloseStatementRequest { CloseRequest close_request = 1; }
+
+message CloseStatementResponse { CloseResponse close_response = 1; }
+
+message CloseSessionRequest { CloseRequest close_request = 1; }
+
+message CloseSessionResponse { CloseResponse close_response = 1; }
+
+message CloseRequest { string context_id = 1; }
+
+message CloseResponse {
+  bool closed = 1;
+  Error error = 2;
+}
+
+message CancelRequest { string context_id = 1; }
+
+message CancelResponse {
+  bool canceled = 1;
+  Error error = 2;
+}
+
+enum ColumnType {
+  COLUMN_TYPE_UNSPECIFIED = 0;
+  COLUMN_TYPE_LONG_INT = 1;
+  COLUMN_TYPE_ULONG_INT = 2;
+  COLUMN_TYPE_INT = 4;
+  COLUMN_TYPE_UINT = 5;
+  COLUMN_TYPE_VARCHAR = 6;
+  COLUMN_TYPE_DOUBLE = 7;
+  COLUMN_TYPE_BYTE = 8;
+  COLUMN_TYPE_UBYTE = 9;
+  COLUMN_TYPE_SHORT = 10;
+  COLUMN_TYPE_USHORT = 11;
+  COLUMN_TYPE_FLOAT = 12;
+  COLUMN_TYPE_DATE = 13;
+  COLUMN_TYPE_DATETIME = 14;
+  COLUMN_TYPE_BOOL = 15;
+  COLUMN_TYPE_BLOB = 16;
+  COLUMN_TYPE_NUMERIC = 17;
+}
+
+enum QueryType {
+  QUERY_TYPE_UNSPECIFIED = 0;
+  QUERY_TYPE_QUERY = 1;
+  QUERY_TYPE_NON_QUERY = 2;
+}
+
+enum QueryExecutionStatus {
+  QUERY_EXECUTION_STATUS_UNSPECIFIED = 0;
+  QUERY_EXECUTION_STATUS_RUNNING = 1;
+  QUERY_EXECUTION_STATUS_SUCCEEDED = 2;
+  QUERY_EXECUTION_STATUS_FAILED = 3;
+  QUERY_EXECUTION_STATUS_CANCELLED = 4;
+  QUERY_EXECUTION_STATUS_ABORTED = 5;
+}
