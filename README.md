@@ -27,25 +27,37 @@ pysqream conforms to Python DB-API specifications [PEP-249](https://www.python.o
 
    We recommend upgrading to the latest version of `pip` before installing. To verify that you are on the latest version, run the following command:
 
-   `$ python -m pip install --upgrade pip`
+   `$ python3 -m pip install --upgrade pip`
 
    Note: On macOS, you may want to use virtualenv to install Python and the connector, to ensure compatibility with the built-in Python environment
 
-3. GRPC & Proto
 
-   The Python connector uses grpc for communicate with SQream server.
+3. Install pysqreamV2
 
-   * Optional - update the proto files from the [repository](http://gitlab.sq.l/java/grpc-common)
+    `$ pip3 install pysqreamV2`
 
-   * Install Grpc 
+[//]: # (3. GRPC & Proto)
 
-   `$ python -m pip install grpcio`
+[//]: # ()
+[//]: # (   The Python connector uses grpc for communicate with SQream server.)
 
-   `$ python -m pip install grpcio-tools`
+[//]: # ()
+[//]: # (   * Optional - update the proto files from the [repository]&#40;http://gitlab.sq.l/java/grpc-common&#41;)
 
-   * Generate Grpc code from proto file
+[//]: # ()
+[//]: # (   * Install Grpc )
 
-   `$ python -m grpc_tools.protoc -I/protos --python_out=. --grpc_python_out=. /protos/queryhandler.proto`
+[//]: # ()
+[//]: # (   `$ python -m pip install grpcio`)
+
+[//]: # ()
+[//]: # (   `$ python -m pip install grpcio-tools`)
+
+[//]: # ()
+[//]: # (   * Generate Grpc code from proto file)
+
+[//]: # ()
+[//]: # (   `$ python -m grpc_tools.protoc -I/protos --python_out=. --grpc_python_out=. /protos/queryhandler.proto`)
 
 ## Example 
 
