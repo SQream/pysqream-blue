@@ -7,7 +7,7 @@ import threading, sys, os
 import socket
 import pytest
 from tests.logger import Logger
-import pysqreamV2
+import pysqream_blue
 
 
 q = Queue()
@@ -47,8 +47,8 @@ neg_test_vals = {'tinyint': (258, 3.6, 'test',  (1997, 5, 9), (1997, 12, 12, 10,
                  'nvarchar': (5, 3.6, (1, 2), (1997, 12, 12, 10, 10, 10), False, True)}
 
 
-def connect_pysqreamV2(ip, use_ssl=False):
-    return pysqreamV2.connect(host=ip, use_ssl=use_ssl)
+def connect_pysqream_blue(ip, use_ssl=False):
+    return pysqream_blue.connect(host=ip, use_ssl=use_ssl)
 
 
 class TestBase():
@@ -62,7 +62,7 @@ class TestBase():
         ip = ip if ip else socket.gethostbyname(socket.gethostname())
         Logger().info("Before Scenario")
         Logger().info(f"Connect to server {ip}")
-        self.con = connect_pysqreamV2(ip)
+        self.con = connect_pysqream_blue(ip)
         yield
         Logger().info("After Scenario")
         self.con.close()
@@ -85,7 +85,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
     def test_connection(self):
 
         Logger().info("connect and run select 1")
-        con = connect_pysqreamV2(self.ip, use_ssl=False)
+        con = connect_pysqream_blue(self.ip, use_ssl=False)
         cur = con.cursor()
         try:
             cur.execute("select 1")
@@ -95,41 +95,41 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         cur.close()
         Logger().info("Connection tests - wrong ip")
         try:
-            pysqreamV2.connect(host='123.4.5.6', port='80', database='master', username='sqream', password='sqream',  use_ssl=False)
+            pysqream_blue.connect(host='123.4.5.6', port='80', database='master', username='sqream', password='sqream',  use_ssl=False)
         except Exception as e:
             if "Error from grpc while attempting to open database connection" not in repr(e):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong port")
         try:
-            pysqreamV2.connect(host=self.ip, port='6000', database='master', username='sqream', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.ip, port='6000', database='master', username='sqream', password='sqream', use_ssl=False)
         except Exception as e:
             if "Error from grpc while attempting to open database connection" not in repr(e):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong database")
         try:
-            pysqreamV2.connect(host=self.ip, port='80', database='wrong_db', username='sqream', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.ip, port='80', database='wrong_db', username='sqream', password='sqream', use_ssl=False)
         except Exception as e:
             if "Database \'wrong_db\' does not exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong username")
         try:
-            pysqreamV2.connect(host=self.ip, port='80', database='master', username='wrong_username', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.ip, port='80', database='master', username='wrong_username', password='sqream', use_ssl=False)
         except Exception as e:
             if "role \'wrong_username\' doesn't exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong password")
         try:
-            pysqreamV2.connect(host=self.ip, port='80', database='master', username='sqream', password='wrong_pw', use_ssl=False)
+            pysqream_blue.connect(host=self.ip, port='80', database='master', username='sqream', password='wrong_pw', use_ssl=False)
         except Exception as e:
             if "wrong password for role 'sqream'" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - close() function")
-        con = connect_pysqreamV2(self.ip)
+        con = connect_pysqream_blue(self.ip)
         cur = con.cursor()
         cur.close()
         try:
@@ -139,7 +139,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
               raise Exception("bad error message")
 
         Logger().info("Connection tests - Trying to close a connection that is already closed with close()")
-        con = connect_pysqreamV2(self.ip)
+        con = connect_pysqream_blue(self.ip)
         con.close()
         try:
             con.close()
@@ -150,13 +150,13 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         # ssl not supported
         # Logger().info("Connection tests - negative test for use_ssl=True")
         # try:
-        #     pysqreamV2.connect(self.ip, 5000, 'master', 'sqream', 'sqream', False, True)
+        #     pysqream_blue.connect(self.ip, 5000, 'master', 'sqream', 'sqream', False, True)
         # except Exception as e:
         #     if "Using use_ssl=True but connected to non ssl sqreamd port" not in repr(e):
         #         raise Exception("bad error message")
 
         # Logger().info("Connection tests - positive test for use_ssl=True")
-        # con = connect_pysqreamV2(False, True)
+        # con = connect_pysqream_blue(False, True)
         # res = con.execute('select 1').fetchall()[0][0]
         # if res != 1:
         #     if f'expected to get 1, instead got {res}' not in repr(e):
@@ -562,7 +562,7 @@ class TestTimeout(TestBaseWithoutBeforeAfter):
         con = None
         try:
             Logger().info("test_timeout after 120 seconds")
-            con = pysqreamV2.connect(host=self.ip, use_ssl=False, query_timeout=120)
+            con = pysqream_blue.connect(host=self.ip, use_ssl=False, query_timeout=120)
             cur = con.cursor()
             cur.execute("select sleep(200)")
         except Exception as e:
@@ -581,7 +581,7 @@ class TestNoTimeout(TestBaseWithoutBeforeAfter):
             Logger().info("test_no_timeout")
             start_time = datetime.now()
             Logger().info(start_time)
-            con = pysqreamV2.connect(host=self.ip, use_ssl=False)
+            con = pysqream_blue.connect(host=self.ip, use_ssl=False)
             cur = con.cursor()
             cur.execute("select sleep(200)")
             end_time = datetime.now()

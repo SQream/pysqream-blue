@@ -1,8 +1,8 @@
-# Python connector for SQream DB V2
+# Python connector for SQream DB Blue
 
 * **Author:** Daniel Gutman
 * **Version:** 1.0.0
-* **Supported SQream DB versions:** >= V2 Blue Cloud
+* **Supported SQream DB versions:** >= Blue Cloud
 
 The Python connector for SQream DB is a Python DB API 2.0-compliant interface for developing Python applications with SQream DB.
 
@@ -32,9 +32,9 @@ pysqream conforms to Python DB-API specifications [PEP-249](https://www.python.o
    Note: On macOS, you may want to use virtualenv to install Python and the connector, to ensure compatibility with the built-in Python environment
 
 
-3. Install pysqreamV2
+3. Install pysqream-blue
 
-    `$ pip3 install pysqreamV2`
+    `$ pip3 install pysqream-blue`
 
 [//]: # (3. GRPC & Proto)
 
@@ -77,10 +77,10 @@ Connection parameters include:
 
 ```
 
-   import pysqreamV2
+   import pysqream_blue
 
    # Create a connection object
-   con = pysqreamV2.connect(host='127.0.0.1', port='80', database='master', username='sqream', password='sqream')
+   con = pysqream_blue.connect(host='127.0.0.1', port='80', database='master', username='sqream', password='sqream')
 
    # Create a new cursor
    cur = con.cursor()
@@ -111,11 +111,11 @@ If any connection error appears, verify that you have access to a running SQream
 
    To enable logging, pass a path to a log file in the connection string as follows:
 
-   `con = pysqream.connect('127.0.0.1', '80', log = '/path/to/logfile.xx')`
+   `con = pysqream_blue.connect('127.0.0.1', '80', log = '/path/to/logfile.xx')`
 
    Or pass True to save to  `'/tmp/sqream_dbapi.log'`:
 
-   `con = pysqream.connect('127.0.0.1', '80', log =True)`
+   `con = pysqream_blue.connect('127.0.0.1', '80', log =True)`
 
 
 ## TODO (when server support):
