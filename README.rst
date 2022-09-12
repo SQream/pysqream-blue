@@ -1,6 +1,3 @@
-.. role:: bash(code)
-   :language: bash
-
 ===================================
 Python connector for SQream DB Blue
 ===================================
