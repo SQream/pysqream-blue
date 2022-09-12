@@ -1,7 +1,13 @@
 import grpc
-qh_messages, qh_services = grpc.protos_and_services("protos/queryhandler.proto")
-auth_messages, auth_services = grpc.protos_and_services("protos/authentication.proto")
-cl_messages, cl_services = grpc.protos_and_services("protos/client_info.proto")
+# qh_messages, qh_services = grpc.protos_and_services("protos/queryhandler.proto")
+# auth_messages, auth_services = grpc.protos_and_services("protos/authentication.proto")
+# cl_messages, cl_services = grpc.protos_and_services("protos/client_info.proto")
+import protos.queryhandler_pb2 as qh_messages
+import protos.queryhandler_pb2_grpc as qh_services
+import protos.authentication_pb2 as auth_messages
+import protos.authentication_pb2_grpc as auth_services
+import protos.client_info_pb2 as cl_messages
+import protos.client_info_pb2_grpc as cl_services
 
 __version__ = '1.0.13'
 
