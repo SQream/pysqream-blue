@@ -1,7 +1,7 @@
 # Python connector for SQream DB Blue
 
 * **Author:** Daniel Gutman
-* **Version:** 1.0.0
+* **Version:** 1.0.8
 * **Supported SQream DB versions:** >= Blue Cloud
 
 The Python connector for SQream DB is a Python DB API 2.0-compliant interface for developing Python applications with SQream DB.
@@ -15,7 +15,7 @@ pysqream conforms to Python DB-API specifications [PEP-249](https://www.python.o
 
 1. Python
 
-   The connector requires Python 3.6.8 or newer. To verify your version of Python:
+   The connector requires Python 3.6.x or newer. To verify your version of Python:
 
    `$ python --version`
 
@@ -36,28 +36,29 @@ pysqream conforms to Python DB-API specifications [PEP-249](https://www.python.o
 
     `$ pip3 install pysqream-blue`
 
-[//]: # (3. GRPC & Proto)
+<!--- (3. GRPC & Proto)
 
-[//]: # ()
-[//]: # (   The Python connector uses grpc for communicate with SQream server.)
 
-[//]: # ()
-[//]: # (   * Optional - update the proto files from the [repository]&#40;http://gitlab.sq.l/java/grpc-common&#41;)
+   The Python connector uses grpc for communicate with SQream server.
 
-[//]: # ()
-[//]: # (   * Install Grpc )
 
-[//]: # ()
-[//]: # (   `$ python -m pip install grpcio`)
+   * Optional - update the proto files from the [repository](http://gitlab.sq.l/java/grpc-common)
 
-[//]: # ()
-[//]: # (   `$ python -m pip install grpcio-tools`)
 
-[//]: # ()
-[//]: # (   * Generate Grpc code from proto file)
+   * Install Grpc 
 
-[//]: # ()
-[//]: # (   `$ python -m grpc_tools.protoc -I/protos --python_out=. --grpc_python_out=. /protos/queryhandler.proto`)
+
+   `$ python -m pip install grpcio`
+
+
+   `$ python -m pip install grpcio-tools`
+
+
+   * Generate Grpc code from proto file
+
+
+   `$ python -m grpc_tools.protoc -I/protos --python_out=. --grpc_python_out=. /protos/queryhandler.proto`
+--->
 
 ## Example 
 
