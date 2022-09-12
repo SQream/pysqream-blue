@@ -1,3 +1,4 @@
+
 ===================================
 Python connector for SQream DB Blue
 ===================================
@@ -17,12 +18,12 @@ pysqream conforms to Python DB-API specifications `PEP-249 <https://www.python.o
 .. For more information and a full API reference, see `SQream documentation's pysqream blue guide <https://sqream-docs.readthedocs.io/en/latest/guides/client_drivers/python/index.html>`_ .
 
 Requirements
-====================
+-------------
 
 * Python 3.6.5+, with 3.7+ highly recommended
 
 Installing the Python connector
-==================================
+--------------------------------
 
 Prerequisites
 ----------------
