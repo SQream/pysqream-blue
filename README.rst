@@ -2,7 +2,7 @@
    :language: bash
 
 ===================================
-Python connector for sqream DB Blue
+Python connector for SQream DB Blue
 ===================================
 
 * **Version:**  1.0.10
