@@ -146,30 +146,26 @@ Or pass True to save to `'/tmp/sqream_dbapi.log'`:
 TODO (when server support):
 -----------------------------------------
 
-   * use ssl connection.
-   * send the token recived in authentication in every following request as call credentials (compile, execute, etc).
-   * parametered queries / network insert.
-   the existing code related to those points is a preparation and not reliable.
+* use ssl connection.
+* send the token recived in authentication in every following request as call credentials (compile, execute, etc).
+* parametered queries / network insert.
+  the existing code related to those points is a preparation and not reliable.
 
 Differences from V1 pysqream (from user view):
------------------------------------------
-   * The parameters to connect function are different (some were removed and some were added).
-   * SSL connection not supported.
-   * `executemany()` (- network insert) not supported.
+-----------------------------------------------
+* The parameters to connect function are different (some were removed and some were added).
+* SSL connection not supported.
+* `executemany()` (- network insert) not supported.
 
 
 Design decisions:
 -----------------------------------------
-   * The grpc chunnel and stubs are opened and closed by `__init__` and `__del__` methods (which call `_connect_to_server()` and `_disconnect_server()` where the implementation itself is).
+* The grpc chunnel and stubs are opened and closed by `__init__` and `__del__` methods (which call `_connect_to_server()` and `_disconnect_server()` where the implementation itself is).
+  The authentication with sqream and receipt a token made by `connect_database()` method (while `close()` close it).
+  User can call `close()` and then `connect_database()` for swiching between databases on the same server.
+  It may make sense to decide to close the chunnel as well in `close()` method (which is a part of DB API).
 
-     The authentication with sqream and receipt a token made by `connect_database()` method (while `close()` close it).
+* The same chunnel and stubs used for all cursors of a connection but every cursor open his own token.
+  it may make sense to decide to use different stubs or chunnel for every cursor or to use the same token for all.
 
-     User can call `close()` and then `connect_database()` for swiching between databases on the same server.
-
-     It may make sense to decide to close the chunnel as well in `close()` method (which is a part of DB API).
-
-   * The same chunnel and stubs used for all cursors of a connection but every cursor open his own token.
-
-     it may make sense to decide to use different stubs or chunnel for every cursor or to use the same token for all.
-
-   * Fetch methods return list of list and not list of tuple
+* Fetch methods return list of list and not list of tuple
