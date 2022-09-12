@@ -3,7 +3,7 @@ qh_messages, qh_services = grpc.protos_and_services("protos/queryhandler.proto")
 auth_messages, auth_services = grpc.protos_and_services("protos/authentication.proto")
 cl_messages, cl_services = grpc.protos_and_services("protos/client_info.proto")
 
-__version__ = '1.0.3'
+__version__ = '1.0.13'
 
 dbapi_typecodes = {
     qh_messages.COLUMN_TYPE_LONG_INT:  'NUMBER',
