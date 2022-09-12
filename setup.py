@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from pysqream_blue.globals import __version__
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README.rst", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r", encoding="utf-8") as req:
@@ -11,7 +11,7 @@ setup_params = dict(
     name =          'pysqream-blue',
     version =       __version__,
     description =   'DB-API connector for SQream DB', 
-    long_description_content_type = long_description,
+    long_description = long_description,
     url = "https://github.com/SQream/pysqream-blue",
     author = "SQream",
     author_email = "info@sqream.com",
