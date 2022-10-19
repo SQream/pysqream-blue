@@ -120,7 +120,8 @@ class Connection:
 
         if self.is_base_connection:
             for cursor in self.cursors:
-                cursor.close()
+                if cursor.statement_opened:
+                    cursor.close()
 
         try:
             close_response: qh_messages.CloseResponse = self.client.CloseSession(

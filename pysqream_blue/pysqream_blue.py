@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import time
 from datetime import datetime, date, time as t
 from connection import Connection, qh_messages

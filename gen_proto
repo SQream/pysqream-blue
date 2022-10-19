@@ -1,0 +1,5 @@
+python3 -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=protos/ \
+        protos/error.proto \
+        protos/client_info.proto \
+        protos/authentication.proto \
+        protos/queryhandler.proto

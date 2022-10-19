@@ -88,7 +88,6 @@ class Cursor:
         if len(res):
             return res
 
-        self.close()
         return None
 
     def fetchone(self, bad_args=False):
@@ -105,7 +104,6 @@ class Cursor:
         if bad_args:
             log_and_raise(ProgrammingError, "Bad argument to fetchall()")
         res = self.fetchmany(-1)
-        self.close()
         return res
 
     def get_statement_id(self):
@@ -163,7 +161,8 @@ class Cursor:
                 log_and_raise(OperationalError,
                               f'Query id: {self.stmt_id}. Error while attempting to get query status.\n{status_response.error}')
 
-            if status_response.status != qh_messages.QUERY_EXECUTION_STATUS_RUNNING:
+            if status_response.status != qh_messages.QUERY_EXECUTION_STATUS_RUNNING and \
+                    status_response.status != qh_messages.QUERY_EXECUTION_STATUS_QUEUED:
                 self.stmt_status = status_response.status
                 log_info(
                     f'Query id: {self.stmt_id}. status: {qh_messages.QueryExecutionStatus.Name(self.stmt_status)}.')
@@ -179,7 +178,6 @@ class Cursor:
            (name, type_code, display_size, internal_size, precision, scale, null_ok) '''
 
         if self.query_type == qh_messages.QUERY_TYPE_NON_QUERY:
-            self.close()
             return
         elif self.query_type != qh_messages.QUERY_TYPE_QUERY:
             log_and_raise(OperationalError, "Query id: {self.stmt_id}. Query type {self.query_type} is not supported")
