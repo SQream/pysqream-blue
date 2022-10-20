@@ -95,7 +95,7 @@ paramstyle = 'qmark'
 #                 print(*(desc[0] for desc in cursor.description), sep=', ')
 #                 print(*cursor.fetchall() or [], sep="\n")
 #                 print(f'{cursor.rowcount} rows')
+#                 cursor.close()
 #         except Exception as e:
 #             print(e)
-#         cursor.close()
 #     con.close()
