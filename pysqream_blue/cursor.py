@@ -31,8 +31,8 @@ class Cursor:
         # self._verify_open()
         if params:
             log_and_raise(NotSupportedError, "Parametered queries currently not supported.")
-        if self.statement_opened:
-            self.close()
+        # if self.statement_opened:
+        #     self.close()
 
         self._request_compile(query)
         self.statement_opened = True
