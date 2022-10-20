@@ -121,6 +121,7 @@ class Connection:
         if self.is_base_connection:
             for cursor in self.cursors:
                 if cursor.statement_opened:
+                    log_info("Try to close stmt")
                     cursor.close()
 
         try:
