@@ -11,7 +11,6 @@ class Connection:
 
     def __init__(self, host: str, port: str, use_ssl: bool = False, log = False, is_base_connection: bool = True,
                  reconnect_attempts : int = 10, reconnect_interval : int = 3, query_timeout: int = 0):
-        log = True
         self.host, self.port, self.use_ssl = host, port, use_ssl
         self.is_base_connection = is_base_connection
         self.reconnect_attempts, self.reconnect_interval = reconnect_attempts, reconnect_interval
@@ -122,7 +121,6 @@ class Connection:
         if self.is_base_connection:
             for cursor in self.cursors:
                 if cursor.statement_opened:
-                    log_info("Try to close stmt")
                     cursor.close()
 
         try:
