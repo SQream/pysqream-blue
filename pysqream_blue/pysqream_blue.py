@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import time
 from datetime import datetime, date, time as t
 from connection import Connection, qh_messages
@@ -93,7 +95,7 @@ paramstyle = 'qmark'
 #                 print(*(desc[0] for desc in cursor.description), sep=', ')
 #                 print(*cursor.fetchall() or [], sep="\n")
 #                 print(f'{cursor.rowcount} rows')
+#                 cursor.close()
 #         except Exception as e:
 #             print(e)
-#         cursor.close()
 #     con.close()
