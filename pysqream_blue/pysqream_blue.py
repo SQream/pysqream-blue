@@ -5,8 +5,8 @@ from datetime import datetime, date, time as t
 from connection import Connection, qh_messages
 
 
-def connect(host:      str =  '127.0.0.1',
-            port:      str =  '80',
+def connect(host:      ,
+            port:      str =  '443',
             use_ssl:   bool = False,
             log              = False,
             database:  str =  'master',
@@ -81,8 +81,8 @@ threadsafety = 1 # Threads can share the module but not a connection
 paramstyle = 'qmark'
 
 
-# if __name__ == '__main__':
-#     con = connect(host='192.168.4.4', database='master')
+#if __name__ == '__main__':
+#     con = connect(host='4_52.isqream.com', database='master')
 #     query = None
 #     while (True):
 #         cursor = con.cursor()
