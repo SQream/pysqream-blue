@@ -39,12 +39,9 @@ class Connection:
         while True:
             try:
                 options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3)]
-                if self.use_ssl:
-                    log_and_raise(NotSupportedError, 'SQream dose not currently support ssl connection')
-                    # options.append(("grpc.enable_http_proxy", 0))
-                    # self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(), options=options)
-                else:
-                    self.channel = grpc.insecure_channel(f'{self.host}:{self.port}', options=options)
+                #self.channel = grpc.insecure_channel(f'{self.host}:{self.port}', options=options)
+                options.append(("grpc.enable_http_proxy", 0))
+                self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(), options=options)
                 self.auth_stub = auth_services.AuthenticationServiceStub(self.channel)
                 self.client    = qh_services.QueryHandlerServiceStub(self.channel)
                 break
