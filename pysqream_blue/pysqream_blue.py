@@ -5,7 +5,7 @@ from datetime import datetime, date, time as t
 from connection import Connection, qh_messages
 
 
-def connect(host:      ,
+def connect(host:      str,
             port:      str =  '443',
             use_ssl:   bool = False,
             log              = False,
