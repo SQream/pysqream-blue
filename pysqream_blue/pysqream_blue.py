@@ -2,8 +2,8 @@
 
 import time
 from datetime import datetime, date, time as t
-from connection import Connection, qh_messages
-
+from connection import Connection
+# from connection import qh_messages
 
 def connect(host:      str,
             port:      str =  '443',
