@@ -81,21 +81,21 @@ threadsafety = 1 # Threads can share the module but not a connection
 paramstyle = 'qmark'
 
 
-if __name__ == '__main__':
-    con = connect(host='4_52.isqream.com', database='master')
-    query = None
-    while (True):
-        cursor = con.cursor()
-        query = input(f'{con.database}=> ')
-        if '\q' == query:
-            break
-        try:
-            cursor.execute(query)
-            if cursor.query_type == qh_messages.QUERY_TYPE_QUERY:
-                print(*(desc[0] for desc in cursor.description), sep=', ')
-                print(*cursor.fetchall() or [], sep="\n")
-                print(f'{cursor.rowcount} rows')
-                cursor.close()
-        except Exception as e:
-            print(e)
-    con.close()
+# if __name__ == '__main__':
+#     con = connect(host='4_52.isqream.com', database='master')
+#     query = None
+#     while (True):
+#         cursor = con.cursor()
+#         query = input(f'{con.database}=> ')
+#         if '\q' == query:
+#             break
+#         try:
+#             cursor.execute(query)
+#             if cursor.query_type == qh_messages.QUERY_TYPE_QUERY:
+#                 print(*(desc[0] for desc in cursor.description), sep=', ')
+#                 print(*cursor.fetchall() or [], sep="\n")
+#                 print(f'{cursor.rowcount} rows')
+#                 cursor.close()
+#         except Exception as e:
+#             print(e)
+#     con.close()
