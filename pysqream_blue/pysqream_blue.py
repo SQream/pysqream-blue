@@ -5,9 +5,9 @@ from datetime import datetime, date, time as t
 from connection import Connection, qh_messages
 
 
-def connect(host:      str =  '127.0.0.1',
-            port:      str =  '80',
-            use_ssl:   bool = False,
+def connect(host:      str,
+            port:      str =  '443',
+            use_ssl:   bool = True,
             log              = False,
             database:  str =  'master',
             username:  str =  'sqream',
@@ -82,7 +82,7 @@ paramstyle = 'qmark'
 
 
 # if __name__ == '__main__':
-#     con = connect(host='192.168.4.4', database='master')
+#     con = connect(host='4_52.isqream.com', database='master')
 #     query = None
 #     while (True):
 #         cursor = con.cursor()

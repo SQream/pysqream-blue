@@ -9,9 +9,11 @@ from cursor import Cursor
 class Connection:
     ''' Connection class used to interact with SQream '''
 
-    def __init__(self, host: str, port: str, use_ssl: bool = False, log = False, is_base_connection: bool = True,
+    def __init__(self, host: str, port: str, use_ssl: bool = True, log = False, is_base_connection: bool = True,
                  reconnect_attempts : int = 10, reconnect_interval : int = 3, query_timeout: int = 0):
         self.host, self.port, self.use_ssl = host, port, use_ssl
+        # Product want to connect with SSL
+        self.use_ssl = True
         self.is_base_connection = is_base_connection
         self.reconnect_attempts, self.reconnect_interval = reconnect_attempts, reconnect_interval
         self.connected = False
@@ -40,9 +42,8 @@ class Connection:
             try:
                 options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3)]
                 if self.use_ssl:
-                    log_and_raise(NotSupportedError, 'SQream dose not currently support ssl connection')
-                    # options.append(("grpc.enable_http_proxy", 0))
-                    # self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(), options=options)
+                    options.append(("grpc.enable_http_proxy", 0))
+                    self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(), options=options)
                 else:
                     self.channel = grpc.insecure_channel(f'{self.host}:{self.port}', options=options)
                 self.auth_stub = auth_services.AuthenticationServiceStub(self.channel)
