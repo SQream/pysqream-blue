@@ -9,7 +9,7 @@ import json
 from casting import *
 
 
-class Cursor:
+class CursorBlue:
 
     def __init__(self, client, context_id, query_timeout, call_credentialds, use_ssl):
 

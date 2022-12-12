@@ -3,10 +3,10 @@ import grpc
 from globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages
 import time
 import socket
-from cursor import Cursor
+from cursor import CursorBlue
 
 
-class Connection:
+class ConnectionBlue:
     ''' Connection class used to interact with SQream '''
 
     def __init__(self, host: str, port: str, use_ssl: bool = True, log = False, is_base_connection: bool = True,
@@ -165,6 +165,6 @@ class Connection:
             but different session (authentication / token)"""
 
         self._verify_open()
-        cur = Cursor(self.client, self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl)
+        cur = CursorBlue(self.client, self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl)
         self.cursors.append(cur)
         return cur

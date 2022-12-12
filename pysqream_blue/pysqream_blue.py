@@ -2,7 +2,7 @@
 
 import time
 from datetime import datetime, date, time as t
-from connection import Connection
+from connection import ConnectionBlue
 # from connection import qh_messages
 
 def connect(host:      str,
@@ -18,10 +18,10 @@ def connect(host:      str,
             reconnect_interval : int = 3,
             query_timeout      : int = 0
 
-            ) -> Connection:
+            ) -> ConnectionBlue:
     ''' Connect to SQream database '''
 
-    conn = Connection(host, port, use_ssl, log=log, is_base_connection=True, reconnect_attempts=reconnect_attempts,
+    conn = ConnectionBlue(host, port, use_ssl, log=log, is_base_connection=True, reconnect_attempts=reconnect_attempts,
                       reconnect_interval=reconnect_interval, query_timeout=query_timeout)
     conn.connect_database(database, username, password, tenant_id, service)
 
