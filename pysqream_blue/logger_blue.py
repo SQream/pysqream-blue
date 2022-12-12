@@ -1,5 +1,5 @@
 import logging
-from utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
+from utils_blue import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
     DatabaseError, InterfaceError, Warning, Error
 
 logger = logging.getLogger("dbapi_logger")

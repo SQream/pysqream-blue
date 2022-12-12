@@ -1,12 +1,12 @@
 import grpc
-from globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter
+from globals_blue import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter
 import time
-from logger import *
-from utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
+from logger_blue import *
+from utils_blue import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
     DatabaseError, InterfaceError, Warning, Error
 from collections.abc import Sequence
 import json
-from casting import *
+from casting_blue import *
 
 
 class CursorBlue:

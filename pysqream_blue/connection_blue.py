@@ -1,6 +1,6 @@
-from logger import *
+from logger_blue import *
 import grpc
-from globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages
+from globals_blue import auth_services, auth_messages, qh_services, qh_messages, cl_messages
 import time
 import socket
 from cursor_blue import CursorBlue
