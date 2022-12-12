@@ -3,7 +3,7 @@ import grpc
 from globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages
 import time
 import socket
-from cursor import CursorBlue
+from cursor_blue import CursorBlue
 
 
 class ConnectionBlue:

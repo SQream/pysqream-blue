@@ -2,7 +2,7 @@
 
 import time
 from datetime import datetime, date, time as t
-from connection import ConnectionBlue
+from connection_blue import ConnectionBlue
 # from connection import qh_messages
 
 def connect(host:      str,
