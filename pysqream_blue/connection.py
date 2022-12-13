@@ -1,9 +1,9 @@
-from logger import *
+from pysqream_blue.logger import *
 import grpc
-from globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages
+from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages
 import time
 import socket
-from cursor import Cursor
+from pysqream_blue.cursor import Cursor
 
 
 class Connection:

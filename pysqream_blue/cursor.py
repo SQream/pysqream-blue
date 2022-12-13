@@ -1,12 +1,12 @@
 import grpc
-from globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter
+from pysqream_blue.globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter
 import time
-from logger import *
-from utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
+from pysqream_blue.logger import *
+from pysqream_blue.utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
     DatabaseError, InterfaceError, Warning, Error
 from collections.abc import Sequence
 import json
-from casting import *
+from pysqream_blue.casting import *
 
 
 class Cursor:
