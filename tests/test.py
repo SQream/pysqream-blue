@@ -83,7 +83,7 @@ class Query():
         return res
 
 
-class TestBase(Query):
+class TestBase():
 
     @pytest.fixture()
     def domain(self, pytestconfig):
@@ -95,11 +95,23 @@ class TestBase(Query):
         Logger().info("Before Scenario")
         Logger().info(f"Connect to server with domain {domain}")
         self.con = connect_pysqream_blue(domain)
+        self.query = Query(self.con)
         yield
         Logger().info("After Scenario")
         self.con.close()
         Logger().info(f"Close Session to server {domain}")
 
+    def fetch(self, query):
+        return self.query.execute(query)
+
+    def execute(self, query):
+        self.query.execute(query)
+
+    def fetchmany(self, query, number):
+        return self.query.fetchmany(query, number)
+
+    def fetchone(self, query):
+        return self.query.fetchone(query)
 
 class TestBaseWithoutBeforeAfter():
     @pytest.fixture()
