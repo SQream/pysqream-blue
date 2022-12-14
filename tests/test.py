@@ -704,7 +704,7 @@ class TestAbort(TestBase):
             cur.close()
 
         Logger().info("Abort test - Abort Query on close session test")
-        cur = self.con.cursor()
+
         self.con.close()
         try:
             cur.cancel()
