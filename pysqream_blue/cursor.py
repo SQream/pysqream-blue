@@ -88,7 +88,6 @@ class Cursor:
         if len(res):
             return res
 
-        self.close()
         return None
 
     def fetchone(self, bad_args=False):
@@ -105,7 +104,6 @@ class Cursor:
         if bad_args:
             log_and_raise(ProgrammingError, "Bad argument to fetchall()")
         res = self.fetchmany(-1)
-        self.close()
         return res
 
     def get_statement_id(self):
