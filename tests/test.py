@@ -102,7 +102,7 @@ class TestBase():
         Logger().info(f"Close Session to server {domain}")
 
     def fetch(self, query):
-        return self.query.execute(query)
+        return self.query.fetch(query)
 
     def execute(self, query):
         self.query.execute(query)
