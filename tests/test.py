@@ -23,7 +23,7 @@ def generate_varchar(length):
 col_types = {'bool', 'tinyint', 'smallint', 'int', 'bigint', 'real', 'double', 'date', 'datetime', 'nvarchar({})'.format(varchar_length)}#, 'varchar({})'.format(varchar_length)}
 
 
-pos_test_vals = {'bool': (0, 1, True, False, 2, 3.6),
+pos_test_vals = {'bool': (0, 1, True, False, 2),
                  'tinyint': (randint(0, 255), randint(0, 255), 0, 255, True, False),
                  'smallint': (randint(-32768, 32767), 0, -32768, 32767, True, False),
                  'int': (randint(-2147483648, 2147483647), 0, -2147483648, 2147483647, True, False),
@@ -47,36 +47,80 @@ neg_test_vals = {'tinyint': (258, 3.6, 'test',  (1997, 5, 9), (1997, 12, 12, 10,
                  'nvarchar': (5, 3.6, (1, 2), (1997, 12, 12, 10, 10, 10), False, True)}
 
 
-def connect_pysqream_blue(ip, use_ssl=False):
-    return pysqream_blue.connect(host=ip, use_ssl=use_ssl)
+def connect_pysqream_blue(domain, use_ssl=True):
+    return pysqream_blue.connect(host=domain, use_ssl=use_ssl)
+
+
+class Query():
+
+    def __init__(self, con):
+        self.con = con
+
+    def fetch(self, query):
+        cur = self.con.cursor()
+        cur.execute(query)
+        res = cur.fetchall()
+        cur.close()
+        return res
+
+    def execute(self, query):
+        cur = self.con.cursor()
+        cur.execute(query)
+        cur.close()
+
+    def fetchmany(self, query, number):
+        cur = self.con.cursor()
+        cur.execute(query)
+        res = cur.fetchmany(number)
+        cur.close()
+        return res
+
+    def fetchone(self, query):
+        cur = self.con.cursor()
+        cur.execute(query)
+        res = cur.fetchone()
+        cur.close()
+        return res
 
 
 class TestBase():
 
     @pytest.fixture()
-    def ip(self, pytestconfig):
-        return pytestconfig.getoption("ip")
+    def domain(self, pytestconfig):
+        return pytestconfig.getoption("domain")
 
     @pytest.fixture(autouse=True)
-    def Test_setup_teardown(self, ip):
-        ip = ip if ip else socket.gethostbyname(socket.gethostname())
+    def Test_setup_teardown(self, domain):
+        self.domain = domain
         Logger().info("Before Scenario")
-        Logger().info(f"Connect to server {ip}")
-        self.con = connect_pysqream_blue(ip)
+        Logger().info(f"Connect to server with domain {domain}")
+        self.con = connect_pysqream_blue(domain)
+        self.query = Query(self.con)
         yield
         Logger().info("After Scenario")
         self.con.close()
-        Logger().info(f"Close Session to server {ip}")
+        Logger().info(f"Close Session to server {domain}")
 
+    def fetch(self, query):
+        return self.query.fetch(query)
+
+    def execute(self, query):
+        self.query.execute(query)
+
+    def fetchmany(self, query, number):
+        return self.query.fetchmany(query, number)
+
+    def fetchone(self, query):
+        return self.query.fetchone(query)
 
 class TestBaseWithoutBeforeAfter():
     @pytest.fixture()
-    def ip(self, pytestconfig):
-        return pytestconfig.getoption("ip")
+    def domain(self, pytestconfig):
+        return pytestconfig.getoption("domain")
 
     @pytest.fixture(autouse=True)
-    def Test_setup_teardown(self, ip):
-        self.ip = ip if ip else socket.gethostbyname(socket.gethostname())
+    def Test_setup_teardown(self, domain):
+        self.domain = domain
         yield
 
 
@@ -85,7 +129,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
     def test_connection(self):
 
         Logger().info("connect and run select 1")
-        con = connect_pysqream_blue(self.ip, use_ssl=False)
+        con = connect_pysqream_blue(self.domain, use_ssl=False)
         cur = con.cursor()
         try:
             cur.execute("select 1")
@@ -95,41 +139,41 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         cur.close()
         Logger().info("Connection tests - wrong ip")
         try:
-            pysqream_blue.connect(host='123.4.5.6', port='80', database='master', username='sqream', password='sqream',  use_ssl=False)
+            pysqream_blue.connect(host='123.4.5.6', port='443', database='master', username='sqream', password='sqream',  use_ssl=False)
         except Exception as e:
             if "Error from grpc while attempting to open database connection" not in repr(e):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong port")
         try:
-            pysqream_blue.connect(host=self.ip, port='6000', database='master', username='sqream', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='6000', database='master', username='sqream', password='sqream', use_ssl=False)
         except Exception as e:
             if "Error from grpc while attempting to open database connection" not in repr(e):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong database")
         try:
-            pysqream_blue.connect(host=self.ip, port='80', database='wrong_db', username='sqream', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='wrong_db', username='sqream', password='sqream', use_ssl=False)
         except Exception as e:
             if "Database \'wrong_db\' does not exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong username")
         try:
-            pysqream_blue.connect(host=self.ip, port='80', database='master', username='wrong_username', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='master', username='wrong_username', password='sqream', use_ssl=False)
         except Exception as e:
             if "role \'wrong_username\' doesn't exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong password")
         try:
-            pysqream_blue.connect(host=self.ip, port='80', database='master', username='sqream', password='wrong_pw', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='master', username='sqream', password='wrong_pw', use_ssl=False)
         except Exception as e:
             if "wrong password for role 'sqream'" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - close() function")
-        con = connect_pysqream_blue(self.ip)
+        con = connect_pysqream_blue(self.domain)
         cur = con.cursor()
         cur.close()
         try:
@@ -139,7 +183,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
               raise Exception("bad error message")
 
         Logger().info("Connection tests - Trying to close a connection that is already closed with close()")
-        con = connect_pysqream_blue(self.ip)
+        con = connect_pysqream_blue(self.domain)
         con.close()
         try:
             con.close()
@@ -150,7 +194,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         # ssl not supported
         # Logger().info("Connection tests - negative test for use_ssl=True")
         # try:
-        #     pysqream_blue.connect(self.ip, 5000, 'master', 'sqream', 'sqream', False, True)
+        #     pysqream_blue.connect(self.domain, 5000, 'master', 'sqream', 'sqream', False, True)
         # except Exception as e:
         #     if "Using use_ssl=True but connected to non ssl sqreamd port" not in repr(e):
         #         raise Exception("bad error message")
@@ -167,21 +211,23 @@ class TestPositive(TestBase):
 
     def test_positive(self):
 
-        cur = self.con.cursor()
-
         for col_type in col_types:
             trimmed_col_type = col_type.split('(')[0]
 
             Logger().info(f'Positive tests - Inserted values test for column type {col_type}')
-            cur.execute(f"create or replace table test (t_{trimmed_col_type} {col_type})")
+            Logger().info(f"create or replace table test (t_{trimmed_col_type} {col_type})")
+            self.execute(f"create or replace table test (t_{trimmed_col_type} {col_type})")
             for val in pos_test_vals[trimmed_col_type]:
-                cur.execute('truncate table test')
+                # cur.execute('truncate table test')
+                self.execute('truncate table test')
                 if type(val) in [date, datetime, str]:
-                    cur.execute(f"insert into test values (\'{val}\')")
+                    Logger().info(f"insert into test values (\'{val}\')")
+                    self.execute(f"insert into test values (\'{val}\')")
                 else:
-                    cur.execute(f"insert into test values ({val})")
-                status = cur.execute("select * from test")
-                res = cur.fetchall()[0][0]
+                    Logger().info(f"insert into test values ({val})")
+                    self.execute(f"insert into test values ({val})")
+                Logger().info("select * from test")
+                res = self.fetch("select * from test")[0][0]
                 # Compare
                 if val != res:
                     if trimmed_col_type not in ('bool', 'varchar', 'date', 'datetime', 'real'):
@@ -218,25 +264,20 @@ class TestPositive(TestBase):
         # res_list += [x[0] for x in self.con.fetchall()]
         # if expected_list != res_list:
         #     raise Exception("expected to get {}, instead got {}".format(expected_list, res_list))
-
         Logger().info("Positive tests - Testing select true/false")
-        cur.execute("select false")
-        res = cur.fetchall()[0][0]
+        res = self.fetch("select false")[0][0]
         if res != 0:
             raise Exception("Expected to get result 0, instead got {}".format(res))
-        cur.execute("select true")
-        res = cur.fetchall()[0][0]
+        res = self.fetch("select true")[0][0]
         if res != 1:
             raise Exception("Expected to get result 1, instead got {}".format(res))
 
         Logger().info("Positive tests - Running a statement when there is an open statement")
-        cur.execute("select 1")
+        self.execute("select 1")
         sleep(10)
-        res =cur.execute("select 1").fetchall()[0][0]
+        res = self.fetch("select 1")[0][0]
         if res != 1:
             raise Exception(f'expected to get result 1, instead got {res}')
-
-        cur.close()
 
 
 class TestNegative(TestBase):
@@ -269,56 +310,62 @@ class TestNegative(TestBase):
         #     if "Incosistent data sequences passed for inserting. Please use rows/columns of consistent length" not in repr(e):
         #         raise Exception(f'bad error message')
 
-        cur = self.con.cursor()
-
         Logger().info("Negative tests - Varchar - Conversion of a varchar to a smaller length")
-        cur.execute("create or replace table test (test varchar(10))")
+        self.execute("create or replace table test (test varchar(10))")
         try:
-            cur.executemany("insert into test values ('aa12345678910')")
+            self.execute("insert into test values ('aa12345678910')")
         except Exception as e:
             if "Conversion of a varchar to a smaller length is not supported" not in repr(e):
                             raise Exception(f'bad error message')
 
         Logger().info("Negative tests - Nvarchar - Conversion of a varchar to a smaller length")
-        cur.execute("create or replace table test (test nvarchar(10))")
+        self.execute("create or replace table test (test nvarchar(10))")
         try:
-            cur.executemany("insert into test values ('aa12345678910')")
+            self.execute("insert into test values ('aa12345678910')")
         except Exception as e:
             if "value \'aa12345678910\' is too long for column \'test\' of type TEXT(10)" not in repr(e).replace("""\\""", ''):
                 raise Exception(f'bad error message')
 
         Logger().info("Negative tests - Incorrect usage of fetchmany - fetch without a statement")
-        cur.execute("create or replace table test (xint int)")
+        self.execute("create or replace table test (xint int)")
+        cur = self.con.cursor()
         try:
             cur.fetchmany(2)
         except Exception as e:
             if "No open statement while attempting fetch operation" not in repr(e):
                 raise Exception(f'bad error message')
+        cur.close()
 
         Logger().info("Negative tests - Incorrect usage of fetchall")
-        cur.execute("create or replace table test (xint int)")
-        cur.executemany("select * from test")
+        self.execute("create or replace table test (xint int)")
+        cur = self.con.cursor()
+        cur.execute("select * from test")
         try:
             cur.fetchall(5)
         except Exception as e:
             if "Bad argument to fetchall" not in repr(e):
                 raise Exception(f'bad error message')
+        cur.close()
 
         Logger().info("Negative tests - Incorrect usage of fetchone")
-        cur.execute("create or replace table test (xint int)")
-        cur.executemany("select * from test")
+        self.execute("create or replace table test (xint int)")
+        cur = self.con.cursor()
+        cur.execute("select * from test")
         try:
             cur.fetchone(5)
         except Exception as e:
             if "Bad argument to fetchone" not in repr(e):
                 raise Exception(f'bad error message')
+        cur.close()
 
         Logger().info("Negative tests - Multi statements test")
+        cur = self.con.cursor()
         try:
             cur.execute("select 1; select 1;")
         except Exception as e:
             if "expected one statement, got " not in repr(e):
                 raise Exception(f'bad error message')
+        cur.close()
 
         # not supported network insert
         # Logger().info("Negative tests - Parametered query tests")
@@ -330,8 +377,6 @@ class TestNegative(TestBase):
         # except Exception as e:
         #     if "Parametered queries not supported" not in repr(e):
         #         raise Exception(f'bad error message')
-        cur.close()
-
         Logger().info("Negative tests - running execute on a closed cursor")
         cur = self.con.cursor()
         cur.close()
@@ -366,41 +411,39 @@ class TestFetch(TestBase):
 
     def test_fetch(self):
 
-        cur = self.con.cursor()
         Logger().info("Fetch tests - positive fetch tests")
-        cur.execute("create or replace table test (xint int)")
+        self.execute("create or replace table test (xint int)")
         # network insert not supported
         # self.con.executemany('insert into test values (?)', [(1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,), (9,), (10,)])
         for i in range(1, 10):
-            cur.executemany(f'insert into test values ({i})')
+            self.execute(f'insert into test values ({i})')
 
         # fetchmany(1) vs fetchone()
-        cur.execute("select * from test")
-        res = cur.fetchmany(1)[0][0]
-        cur.execute("select * from test")
-        res2 = cur.fetchone()[0][0]
+        res = self.fetchmany("select * from test", 1)[0][0]
+        res2 = self.fetchone("select * from test")[0][0]
         if res != res2:
             raise Exception(f"fetchmany(1) and fetchone() didn't return the same value. fetchmany(1) is {res} and fetchone() is {res2}")
         # fetchmany(-1) vs fetchall()
-        cur.execute("select * from test")
-        res3 = cur.fetchmany(-1)
-        cur.execute("select * from test")
-        res4 = cur.fetchall()
+        res3 = self.fetchmany("select * from test", -1)[0][0]
+        res4 = self.fetch("select * from test")[0][0]
         if res3 != res4:
             raise Exception("fetchmany(-1) and fetchall() didn't return the same value. fetchmany(-1) is {} and fetchall() is {}".format(res3, res4))
         # fetchone() loop
+        cur = self.con.cursor()
         cur.execute("select * from test")
         for i in range(1, 10):
             x = cur.fetchone()[0][0]
             if x != i:
                 raise Exception("fetchone() returned {} instead of {}".format(x, i))
+        cur.close()
 
         Logger().info("Fetch tests - combined fetch functions")
-        cur.execute("create or replace table test (xint int)")
+        self.execute("create or replace table test (xint int)")
         # network insert not supported
         # self.con.executemany('insert into test values (?)', [(1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,), (9,), (10,)])
         for i in range(1, 10):
-            cur.executemany(f'insert into test values ({i})')
+            self.execute(f'insert into test values ({i})')
+        cur = self.con.cursor()
         cur.execute("select * from test")
         expected_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         res_list = []
@@ -410,12 +453,14 @@ class TestFetch(TestBase):
         res_list += [x[0] for x in cur.fetchall()]
         if expected_list != res_list:
             raise Exception("expected to get {}, instead got {}".format(expected_list, res_list))
+        cur.close()
 
         Logger().info("Fetch tests - fetch functions after all the data has already been read")
-        cur.execute("create or replace table test (xint int)")
+        self.execute("create or replace table test (xint int)")
         # network insert not supported
         # self.con.executemany('insert into test values (?)', [(1,)])
-        cur.executemany('insert into test values (1)')
+        self.execute('insert into test values (1)')
+        cur = self.con.cursor()
         cur.execute("select * from test")
         x = cur.fetchone()[0]
         res = cur.fetchone()
@@ -445,7 +490,9 @@ class TestCursor(TestBase):
         cur = self.con.cursor()
         cur.execute("select 1")
         res1 = cur.fetchall()[0][0]
+        cur.close()
         vals.append(res1)
+        cur = self.con.cursor()
         cur.execute("select 1")
         res2 = cur.fetchall()[0][0]
         vals.append(res2)
@@ -463,11 +510,11 @@ class TestCursor(TestBase):
         #     raise Exception(f"expected to get result 1, instead got {res}")
 
         Logger().info("Cursor tests - fetch functions after all the data has already been read through cursor")
-        cur = self.con.cursor()
-        cur.execute("create or replace table test (xint int)")
+        self.execute("create or replace table test (xint int)")
         # network insert not supported
         # cur.executemany('insert into test values (?)', [(1,)])
-        cur.executemany('insert into test values (1)')
+        self.execute('insert into test values (1)')
+        cur = self.con.cursor()
         cur.execute("select * from test")
         x = cur.fetchone()[0]
         res = cur.fetchone()
@@ -507,16 +554,15 @@ class TestString(TestBase):
         # if res[0][0] != res[1][0]:
         #     raise Exception("expected to get identical strings from select statement. instead got {} and {}".format(res[0][0], res[1][0]))
 
-        cur = self.con.cursor()
-
         Logger().info("String tests - strings with escaped characters")
-        cur.execute("create or replace table test (xvarchar varchar(20))")
+        self.execute("create or replace table test (xvarchar varchar(20))")
         values = [("\t",), ("\n",), ("\\n",), ("\\\n",), (" \\",), ("\\\\",), (" \nt",), ("'abd''ef'",), ("abd""ef",), ("abd\"ef",)]
         # network insert not supported
         # self.con.executemany('insert into test values (?)', values)
         for val in values:
-            cur.executemany(f"insert into test values ($${val[0]}$$)")
-        cur.executemany("select * from test")
+            self.execute(f"insert into test values ($${val[0]}$$)")
+        cur = self.con.cursor()
+        cur.execute("select * from test")
         expected_list = ['', '', '\\n', '\\', ' \\', '\\\\', ' \nt', "'abd''ef'", 'abdef', 'abd"ef']
         res_list = []
         res_list += [x[0] for x in cur.fetchall()]
@@ -528,33 +574,29 @@ class TestString(TestBase):
 class TestDatetime(TestBase):
 
     def test_datetime(self):
-        cur = self.con.cursor()
         Logger().info("Datetime tests - insert different timezones datetime")
         t1 = datetime.strptime(datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"), '%Y-%m-%d %H:%M')
         t2 = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M"), '%Y-%m-%d %H:%M')
-        cur.execute("create or replace table test (xdatetime datetime)")
+        self.execute("create or replace table test (xdatetime datetime)")
         # network insert not supported
         # self.concon.executemany('insert into test values (?)', [(t1,), (t2,)])
-        cur.executemany(f'insert into test values ($${t1}$$)')
-        cur.executemany(f'insert into test values ($${t2}$$)')
-        cur.execute("select * from test")
-        res = cur.fetchall()
+        self.execute(f'insert into test values ($${t1}$$)')
+        self.execute(f'insert into test values ($${t2}$$)')
+        res = self.fetch("select * from test")
         if res[0][0] == res[1][0]:
             raise Exception("expected to get different datetimes")
 
         Logger().info("Datetime tests - insert datetime with microseconds")
         t1 = datetime(1997, 5, 9, 4, 30, 10, 123456)
         t2 = datetime(1997, 5, 9, 4, 30, 10, 987654)
-        cur.execute("create or replace table test (xdatetime datetime)")
+        self.execute("create or replace table test (xdatetime datetime)")
         # network insert not supported
         # self.con.executemany('insert into test values (?)', [(t1,), (t2,)])
-        cur.executemany(f'insert into test values ($${t1}$$)')
-        cur.executemany(f'insert into test values ($${t2}$$)')
-        cur.execute("select * from test")
-        res = cur.fetchall()
+        self.execute(f'insert into test values ($${t1}$$)')
+        self.execute(f'insert into test values ($${t2}$$)')
+        res = self.fetch("select * from test")
         if res[0][0] == res[1][0]:
             raise Exception("expected to get different datetimes")
-        cur.close()
 
 
 class TestTimeout(TestBaseWithoutBeforeAfter):
@@ -562,7 +604,7 @@ class TestTimeout(TestBaseWithoutBeforeAfter):
         con = None
         try:
             Logger().info("test_timeout after 120 seconds")
-            con = pysqream_blue.connect(host=self.ip, use_ssl=False, query_timeout=120)
+            con = pysqream_blue.connect(host=self.domain, use_ssl=False, query_timeout=120)
             cur = con.cursor()
             cur.execute("select sleep(200)")
         except Exception as e:
@@ -581,7 +623,7 @@ class TestNoTimeout(TestBaseWithoutBeforeAfter):
             Logger().info("test_no_timeout")
             start_time = datetime.now()
             Logger().info(start_time)
-            con = pysqream_blue.connect(host=self.ip, use_ssl=False)
+            con = pysqream_blue.connect(host=self.domain, use_ssl=False)
             cur = con.cursor()
             cur.execute("select sleep(200)")
             end_time = datetime.now()
@@ -608,18 +650,19 @@ class TestAbort(TestBase):
             insert_query2 = "insert into big_text values ('eflmg')"
             insert_as_select_query = "insert into big_text select * from big_text"
             Logger().info(create_query)
-            cur.execute(create_query)
+            self.execute(create_query)
             Logger().info(insert_query1)
-            cur.execute(insert_query1)
+            self.execute(insert_query1)
             Logger().info(insert_query2)
-            cur.execute(insert_query2)
+            self.execute(insert_query2)
             for i in range(15):
                 Logger().info(insert_as_select_query)
-                cur.execute(insert_as_select_query)
+                self.execute(insert_as_select_query)
 
             Logger().info("Abort test - Abort Query on fetch test")
             select_fetch_query = "select * from big_text where x like '%ef%'"
             Logger().info(select_fetch_query)
+
             cur.execute(select_fetch_query)
             t = threading.Thread(target=cur.fetchall)
             t.start()
@@ -630,23 +673,25 @@ class TestAbort(TestBase):
         except Exception as e:
             Logger().error(f"An error occurred {e}")
         finally:
+            cur.close()
             drop_query = "drop table big_text"
             Logger().info(drop_query)
-            cur.execute(drop_query)
+            self.execute(drop_query)
 
-        Logger().info("Abort test - Abort Query on execute test")
-        select_sleep = "select sleep(200)"
-        Logger().info(select_sleep)
-        t1 = threading.Thread(target=cur.execute, args=(select_sleep,))
-        t1.start()
-        time.sleep(5)
-        cancel_response = cur.cancel()
-        if not cancel_response:
-            raise ValueError("Can't abort query on execute")
+        # Logger().info("Abort test - Abort Query on execute test")
+        # select_sleep = "select sleep(200)"
+        # Logger().info(select_sleep)
+        # t1 = threading.Thread(target=cur.execute, args=(select_sleep,))
+        # t1.start()
+        # time.sleep(5)
+        # cancel_response = cur.cancel()
+        # if not cancel_response:
+        #     raise ValueError("Can't abort query on execute")
 
         Logger().info("Abort test - Abort Query on close statement")
         select_1 = "select 1"
         Logger().info(select_1)
+        cur = self.con.cursor()
         cur.execute(select_1)
         cur.fetchall()
         try:
@@ -655,8 +700,11 @@ class TestAbort(TestBase):
             expected_error = "Query [{}] already closed"
             if expected_error not in repr(e):
                 raise ValueError(f"expected to get {expected_error}, instead got {e}")
+        finally:
+            cur.close()
 
         Logger().info("Abort test - Abort Query on close session test")
+
         self.con.close()
         try:
             cur.cancel()
