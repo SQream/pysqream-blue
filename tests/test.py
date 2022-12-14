@@ -78,7 +78,7 @@ class Query():
     def fetchone(self, query):
         cur = self.con.cursor()
         cur.execute(query)
-        res = cur.fetchone
+        res = cur.fetchone()
         cur.close()
         return res
 
@@ -359,13 +359,13 @@ class TestNegative(TestBase):
         cur.close()
 
         Logger().info("Negative tests - Multi statements test")
+        cur = self.con.cursor()
         try:
-            cur = self.con.cursor()
             cur.execute("select 1; select 1;")
         except Exception as e:
             if "expected one statement, got " not in repr(e):
                 raise Exception(f'bad error message')
-        cur.execute()
+        cur.close()
 
         # not supported network insert
         # Logger().info("Negative tests - Parametered query tests")
@@ -377,7 +377,6 @@ class TestNegative(TestBase):
         # except Exception as e:
         #     if "Parametered queries not supported" not in repr(e):
         #         raise Exception(f'bad error message')
-        cur.close()
         Logger().info("Negative tests - running execute on a closed cursor")
         cur = self.con.cursor()
         cur.close()
@@ -420,13 +419,13 @@ class TestFetch(TestBase):
             self.execute(f'insert into test values ({i})')
 
         # fetchmany(1) vs fetchone()
-        res = self.fetchmany("select * from test", 1)
-        res2 = self.fetchone("select * from test")
+        res = self.fetchmany("select * from test", 1)[0][0]
+        res2 = self.fetchone("select * from test")[0][0]
         if res != res2:
             raise Exception(f"fetchmany(1) and fetchone() didn't return the same value. fetchmany(1) is {res} and fetchone() is {res2}")
         # fetchmany(-1) vs fetchall()
-        res3 = self.fetchmany("select * from test", -1)
-        res4 = self.fetch("select * from test")
+        res3 = self.fetchmany("select * from test", -1)[0][0]
+        res4 = self.fetch("select * from test")[0][0]
         if res3 != res4:
             raise Exception("fetchmany(-1) and fetchall() didn't return the same value. fetchmany(-1) is {} and fetchall() is {}".format(res3, res4))
         # fetchone() loop
