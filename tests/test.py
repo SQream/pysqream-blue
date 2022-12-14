@@ -95,7 +95,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         cur.close()
         Logger().info("Connection tests - wrong ip")
         try:
-            pysqream_blue.connect(host='123.4.5.6', port='80', database='master', username='sqream', password='sqream',  use_ssl=False)
+            pysqream_blue.connect(host='123.4.5.6', port='443', database='master', username='sqream', password='sqream',  use_ssl=False)
         except Exception as e:
             if "Error from grpc while attempting to open database connection" not in repr(e):
                 raise Exception("bad error message")
@@ -109,21 +109,21 @@ class TestConnection(TestBaseWithoutBeforeAfter):
 
         Logger().info("Connection tests - wrong database")
         try:
-            pysqream_blue.connect(host=self.domain, port='80', database='wrong_db', username='sqream', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='wrong_db', username='sqream', password='sqream', use_ssl=False)
         except Exception as e:
             if "Database \'wrong_db\' does not exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong username")
         try:
-            pysqream_blue.connect(host=self.domain, port='80', database='master', username='wrong_username', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='master', username='wrong_username', password='sqream', use_ssl=False)
         except Exception as e:
             if "role \'wrong_username\' doesn't exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong password")
         try:
-            pysqream_blue.connect(host=self.domain, port='80', database='master', username='sqream', password='wrong_pw', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='master', username='sqream', password='wrong_pw', use_ssl=False)
         except Exception as e:
             if "wrong password for role 'sqream'" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
