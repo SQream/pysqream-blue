@@ -1,5 +1,5 @@
 import logging
-from utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
+from pysqream_blue.utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
     DatabaseError, InterfaceError, Warning, Error
 
 logger = logging.getLogger("dbapi_logger")

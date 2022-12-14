@@ -2,8 +2,8 @@
 
 import time
 from datetime import datetime, date, time as t
-from connection import Connection, qh_messages
-
+from pysqream_blue.connection import Connection
+# from pysqream_blue.connection import qh_messages
 
 def connect(host:      str,
             port:      str =  '443',
