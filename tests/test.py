@@ -23,7 +23,7 @@ def generate_varchar(length):
 col_types = {'bool', 'tinyint', 'smallint', 'int', 'bigint', 'real', 'double', 'date', 'datetime', 'nvarchar({})'.format(varchar_length)}#, 'varchar({})'.format(varchar_length)}
 
 
-pos_test_vals = {'bool': (0, 1, True, False, 2, 3.6),
+pos_test_vals = {'bool': (0, 1, True, False, 2),
                  'tinyint': (randint(0, 255), randint(0, 255), 0, 255, True, False),
                  'smallint': (randint(-32768, 32767), 0, -32768, 32767, True, False),
                  'int': (randint(-2147483648, 2147483647), 0, -2147483648, 2147483647, True, False),
@@ -181,9 +181,9 @@ class TestPositive(TestBase):
                 cur.execute('truncate table test')
                 cur.close()
                 if type(val) in [date, datetime, str]:
-                    Logger().info(f"insert into test values (\'{val}\')")
+                    Logger().info(f"insert into test values (\'{val}\')".encode("utf-8"))
                     cur = self.con.cursor()
-                    cur.execute(f"insert into test values (\'{val}\')")
+                    cur.execute(f"insert into test values (\'{val}\')".encode("utf-8"))
                     cur.close()
                 else:
                     Logger().info(f"insert into test values ({val})")
