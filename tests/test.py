@@ -175,26 +175,17 @@ class TestPositive(TestBase):
             Logger().info(f'Positive tests - Inserted values test for column type {col_type}')
             Logger().info(f"create or replace table test (t_{trimmed_col_type} {col_type})")
             cur.execute(f"create or replace table test (t_{trimmed_col_type} {col_type})")
-            cur.close()
             for val in pos_test_vals[trimmed_col_type]:
-                cur = self.con.cursor()
                 cur.execute('truncate table test')
-                cur.close()
                 if type(val) in [date, datetime, str]:
                     Logger().info(f"insert into test values (\'{val}\')")
-                    cur = self.con.cursor()
                     cur.execute(f"insert into test values (\'{val}\')")
-                    cur.close()
                 else:
                     Logger().info(f"insert into test values ({val})")
-                    cur = self.con.cursor()
                     cur.execute(f"insert into test values ({val})")
-                    cur.close()
                 Logger().info("select * from test")
-                cur = self.con.cursor()
                 status = cur.execute("select * from test")
                 res = cur.fetchall()[0][0]
-                cur.close()
                 # Compare
                 if val != res:
                     if trimmed_col_type not in ('bool', 'varchar', 'date', 'datetime', 'real'):
@@ -231,7 +222,6 @@ class TestPositive(TestBase):
         # res_list += [x[0] for x in self.con.fetchall()]
         # if expected_list != res_list:
         #     raise Exception("expected to get {}, instead got {}".format(expected_list, res_list))
-        cur = self.con.cursor()
         Logger().info("Positive tests - Testing select true/false")
         cur.execute("select false")
         res = cur.fetchall()[0][0]
