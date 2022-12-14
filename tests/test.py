@@ -173,13 +173,17 @@ class TestPositive(TestBase):
             trimmed_col_type = col_type.split('(')[0]
 
             Logger().info(f'Positive tests - Inserted values test for column type {col_type}')
+            Logger().info(f"create or replace table test (t_{trimmed_col_type} {col_type})")
             cur.execute(f"create or replace table test (t_{trimmed_col_type} {col_type})")
             for val in pos_test_vals[trimmed_col_type]:
                 cur.execute('truncate table test')
                 if type(val) in [date, datetime, str]:
+                    Logger().info(f"insert into test values (\'{val}\')")
                     cur.execute(f"insert into test values (\'{val}\')")
                 else:
+                    Logger().info(f"insert into test values ({val})")
                     cur.execute(f"insert into test values ({val})")
+                Logger().info("select * from test")
                 status = cur.execute("select * from test")
                 res = cur.fetchall()[0][0]
                 # Compare
