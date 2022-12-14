@@ -181,9 +181,9 @@ class TestPositive(TestBase):
                 cur.execute('truncate table test')
                 cur.close()
                 if type(val) in [date, datetime, str]:
-                    Logger().info(f"insert into test values (\'{val}\')".encode("utf-8"))
+                    Logger().info(f"insert into test values (\'{val}\')")
                     cur = self.con.cursor()
-                    cur.execute(f"insert into test values (\'{val}\')".encode("utf-8"))
+                    cur.execute(f"insert into test values (\'{val}\')")
                     cur.close()
                 else:
                     Logger().info(f"insert into test values ({val})")
