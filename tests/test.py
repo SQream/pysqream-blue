@@ -275,7 +275,7 @@ class TestPositive(TestBase):
         Logger().info("Positive tests - Running a statement when there is an open statement")
         self.execute("select 1")
         sleep(10)
-        res = self.fetchall("select 1")[0][0]
+        res = self.fetch("select 1")[0][0]
         if res != 1:
             raise Exception(f'expected to get result 1, instead got {res}')
 
@@ -328,8 +328,8 @@ class TestNegative(TestBase):
 
         Logger().info("Negative tests - Incorrect usage of fetchmany - fetch without a statement")
         self.execute("create or replace table test (xint int)")
+        cur = self.con.cursor()
         try:
-            cur = self.con.cursor()
             cur.fetchmany(2)
         except Exception as e:
             if "No open statement while attempting fetch operation" not in repr(e):
