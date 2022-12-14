@@ -637,15 +637,15 @@ class TestAbort(TestBase):
             Logger().info(drop_query)
             cur.execute(drop_query)
 
-        Logger().info("Abort test - Abort Query on execute test")
-        select_sleep = "select sleep(200)"
-        Logger().info(select_sleep)
-        t1 = threading.Thread(target=cur.execute, args=(select_sleep,))
-        t1.start()
-        time.sleep(5)
-        cancel_response = cur.cancel()
-        if not cancel_response:
-            raise ValueError("Can't abort query on execute")
+        # Logger().info("Abort test - Abort Query on execute test")
+        # select_sleep = "select sleep(200)"
+        # Logger().info(select_sleep)
+        # t1 = threading.Thread(target=cur.execute, args=(select_sleep,))
+        # t1.start()
+        # time.sleep(5)
+        # cancel_response = cur.cancel()
+        # if not cancel_response:
+        #     raise ValueError("Can't abort query on execute")
 
         Logger().info("Abort test - Abort Query on close statement")
         select_1 = "select 1"
