@@ -9,7 +9,7 @@ import protos.authentication_pb2_grpc as auth_services
 import protos.client_info_pb2 as cl_messages
 import protos.client_info_pb2_grpc as cl_services
 
-__version__ = '1.0.21'
+__version__ = '1.0.22'
 
 dbapi_typecodes = {
     qh_messages.COLUMN_TYPE_LONG_INT:  'NUMBER',
