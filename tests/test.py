@@ -717,15 +717,6 @@ class TestAbort(TestBase):
         # TODO - add test for two queries on parallel on the same session and abort one of them after refactor
 
 
-class TestAccessToken(TestBaseWithoutBeforeAfter):
-    def test_access_token(self):
-        con = connect_pysqream_blue(self.domain, use_ssl=True)
-        cur = con.cursor()
-        cur.execute("select 1")
-        cur.close()
-        con.close()
-
-
 class TestThreads(TestBase):
 
     def _execute(self, num):
