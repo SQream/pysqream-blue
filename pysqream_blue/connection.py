@@ -128,7 +128,7 @@ class Connection:
 
         self.session_opened = True
         log_info(f'''Connection opened to database {database}. username: {self.username}.
-                    The connection will be valid for {auth_response.exp_time / 1000} seconds.''')
+                    The connection will be valid for {hour / 1000} seconds.''')
 
     def auth_user_password(self) -> auth_messages.AuthResponse:
         return self.auth_stub.Auth(auth_messages.AuthRequest(
