@@ -104,6 +104,7 @@ class Connection:
                               f'Error while attempting to open database connection.\n{auth_response.error}')
 
             self.token = auth_response.token
+            print(f"token:{self.token}")
 
             session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
                 tenant_id=self.tenant_id,
