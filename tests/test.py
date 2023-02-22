@@ -14,7 +14,7 @@ q = Queue()
 varchar_length = 10
 nvarchar_length = 10
 max_bigint = sys.maxsize if sys.platform not in ('win32', 'cygwin') else 2147483647
-
+_access_token="QmQ1VkJ0cGRwYzNQOE5rbUFsdVd1Z2NFSVkzdk1XVW5MQVVnTmlGZ1JwZjhJWEN1WlQ2M3JVcjVDX29OZFhPR3JUNzdkZzdnV0hHMDJOZnNkTFpVYTkxWllJYnUyTng5"
 
 def generate_varchar(length):
     return ''.join(chr(num) for num in randint(32, 128, length))
@@ -48,7 +48,8 @@ neg_test_vals = {'tinyint': (258, 3.6, 'test',  (1997, 5, 9), (1997, 12, 12, 10,
 
 
 def connect_pysqream_blue(domain, use_ssl=True):
-    return pysqream_blue.connect(host=domain, use_ssl=use_ssl)
+    return pysqream_blue.connect(host=domain, use_ssl=use_ssl,
+                                 access_token=_access_token)
 
 
 class Query():
@@ -714,6 +715,15 @@ class TestAbort(TestBase):
                 raise ValueError(f"expected to get {expected_error}, instead got {e}")
 
         # TODO - add test for two queries on parallel on the same session and abort one of them after refactor
+
+
+class TestAccessToken(TestBaseWithoutBeforeAfter):
+    def test_access_token(self):
+        con = connect_pysqream_blue(self.domain, use_ssl=True)
+        cur = con.cursor()
+        cur.execute("select 1")
+        cur.close()
+        con.close()
 
 
 class TestThreads(TestBase):
