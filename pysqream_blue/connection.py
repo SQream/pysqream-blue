@@ -118,7 +118,8 @@ class Connection:
                               f'Error while attempting to open database connection.\n{session_response.error}')
 
             self.context_id, self.sqream_version = session_response.context_id, session_response.sqream_version
-            self.expiration_time = auth_response.exp_time + time.time() * 1000
+            hour = 1 * 60 * 60 * 1000
+            self.expiration_time = hour + time.time() * 1000
             self.call_credentialds = grpc.access_token_call_credentials(self.token)
         except grpc.RpcError as rpc_error:
             log_and_raise(ProgrammingError, f'Error from grpc while attempting to open database connection.\n{rpc_error}')
