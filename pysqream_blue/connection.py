@@ -114,7 +114,7 @@ class Connection:
 
             if session_response.HasField('error'):
                 log_and_raise(OperationalError,
-                              f'Error while attempting to open database connection.\n{auth_response.error}')
+                              f'Error while attempting to open database connection.\n{session_response.error}')
 
             self.context_id, self.sqream_version = session_response.context_id, session_response.sqream_version
             self.expiration_time = auth_response.exp_time + time.time() * 1000
