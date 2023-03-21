@@ -104,21 +104,20 @@ class Connection:
                               f'Error while attempting to open database connection.\n{auth_response.error}')
 
             self.token = auth_response.token
-
-            session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
-                tenant_id=self.tenant_id,
-                database=self.database,
-                source_ip=socket.gethostbyname(socket.gethostname()),
-                client_info=cl_messages.ClientInfo(version='PySQream2_V_111')
-            ), credentials=grpc.access_token_call_credentials(self.token))
+            session_response = self.open_session()
 
             if session_response.HasField('error'):
                 log_and_raise(OperationalError,
                               f'Error while attempting to open database connection.\n{session_response.error}')
 
+            if self.is_token_expored(session_response.error):
+                auth_response = self.auth_access_token()
+                self.token = auth_response.token
+                session_response = self.open_session()
+
             self.context_id, self.sqream_version = session_response.context_id, session_response.sqream_version
-            hour = 1 * 60 * 60 * 1000
-            self.expiration_time = hour + time.time() * 1000
+            # hour = 1 * 60 * 60 * 1000
+            # self.expiration_time = hour + time.time() * 1000
             self.call_credentialds = grpc.access_token_call_credentials(self.token)
         except grpc.RpcError as rpc_error:
             log_and_raise(ProgrammingError, f'Error from grpc while attempting to open database connection.\n{rpc_error}')
@@ -126,8 +125,16 @@ class Connection:
             log_and_raise(OperationalError, f'Error while attempting to open database connection.\n{auth_response.error}')
 
         self.session_opened = True
-        log_info(f'''Connection opened to database {database}. username: {self.username}.
-                    The connection will be valid for {hour / 1000} seconds.''')
+        log_info(f'''Connection opened to database {database}. username: {self.username}.''')
+
+    def open_session(self):
+        session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
+            tenant_id=self.tenant_id,
+            database=self.database,
+            source_ip=socket.gethostbyname(socket.gethostname()),
+            client_info=cl_messages.ClientInfo(version='PySQream2_V_111')
+        ), credentials=grpc.access_token_call_credentials(self.token))
+        return session_response
 
     def auth_user_password(self) -> auth_messages.AuthResponse:
         return self.auth_stub.Auth(auth_messages.AuthRequest(
@@ -157,19 +164,28 @@ class Connection:
                     cursor.close()
 
         try:
-            close_response: qh_messages.CloseResponse = self.client.CloseSession(
-                qh_messages.CloseSessionRequest(close_request=qh_messages.CloseRequest(context_id=self.context_id)),
-                credentials=self.call_credentialds if self.use_ssl else None
-            ).close_response
+            close_response: qh_messages.CloseResponse = self._close()
         except grpc.RpcError as rpc_error:
             log_error(f'Error from grpc while attempting to close database connection.\n{rpc_error}')
             return
+
+        if self.is_token_expored(close_response.error):
+            auth_response = self.auth_access_token()
+            self.token = auth_response.token
+            close_response: qh_messages.CloseResponse = self._close()
+
         if close_response.HasField('error'):
             log_error(f'Error while attempting to close database connection.\n{close_response.error}')
             return
 
         self.session_opened = False
         log_info(f'Connection closed to database {self.database}.')
+
+    def _close(self):
+        return self.client.CloseSession(
+                qh_messages.CloseSessionRequest(close_request=qh_messages.CloseRequest(context_id=self.context_id)),
+                credentials=self.call_credentialds if self.use_ssl else None
+            ).close_response
 
     def _verify_open(self):
         """Verify that connection still open, reconnect if not."""
@@ -179,9 +195,9 @@ class Connection:
 
         if not self.session_opened:
             log_and_raise(ProgrammingError, 'Session has been closed')
-        if self.expiration_time - time.time() * 1000 < 10000:
-            self.session_opened = False
-            self.connect_database(self.database, self.username, self.password, self.tenant_id, self.service, self.access_token)
+        # if self.expiration_time - time.time() * 1000 < 10000:
+        #     self.session_opened = False
+        #     self.connect_database(self.database, self.username, self.password, self.tenant_id, self.service, self.access_token)
 
     def commit(self):
         return None
@@ -200,3 +216,6 @@ class Connection:
         cur = Cursor(self.client, self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl)
         self.cursors.append(cur)
         return cur
+
+    def is_token_expored(self, e: str) -> bool:
+        return e is not None and "expired" in e
