@@ -14,7 +14,9 @@ q = Queue()
 varchar_length = 10
 nvarchar_length = 10
 max_bigint = sys.maxsize if sys.platform not in ('win32', 'cygwin') else 2147483647
-_access_token="bFo2djNpTFBvYXJ4QTNEN0tHMmlDNTlKRW9hSEdEUGdDZjNVUVYyS3lUaGNDNFl0MFYtSTNncFhCaFl2SlYxdC12Y08zbm80VFo2emxndzBrbl92NEhDYTNfc2pnUDZu"
+# _access_token="bFo2djNpTFBvYXJ4QTNEN0tHMmlDNTlKRW9hSEdEUGdDZjNVUVYyS3lUaGNDNFl0MFYtSTNncFhCaFl2SlYxdC12Y08zbm80VFo2emxndzBrbl92NEhDYTNfc2pnUDZu"
+_access_token="QXYwSE5lWnJ2dXJtZkJ6Mzg0RENpcmxWZmpYWmM2UDQtTVo1SWtGRU45TXdjOWtOU1BFMEkwazIxUWtyV3AxRVhTRlFtalV3bU9feVdBMXd0b1hqdWtiWElUM3ZfV0Vh"
+
 
 def generate_varchar(length):
     return ''.join(chr(num) for num in randint(32, 128, length))
@@ -140,35 +142,40 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         cur.close()
         Logger().info("Connection tests - wrong ip")
         try:
-            pysqream_blue.connect(host='123.4.5.6', port='443', database='master', username='sqream', password='sqream',  use_ssl=False)
+            pysqream_blue.connect(host='123.4.5.6', port='443', database='master', username='sqream',
+                                  password='sqream',use_ssl=False, access_token=_access_token)
         except Exception as e:
             if "Error from grpc while attempting to open database connection" not in repr(e):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong port")
         try:
-            pysqream_blue.connect(host=self.domain, port='6000', database='master', username='sqream', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='6000', database='master', username='sqream',
+                                  password='sqream', use_ssl=False, access_token=_access_token)
         except Exception as e:
             if "Error from grpc while attempting to open database connection" not in repr(e):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong database")
         try:
-            pysqream_blue.connect(host=self.domain, port='443', database='wrong_db', username='sqream', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='wrong_db', username='sqream',
+                                  password='sqream', use_ssl=False, access_token=_access_token)
         except Exception as e:
             if "Database \'wrong_db\' does not exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong username")
         try:
-            pysqream_blue.connect(host=self.domain, port='443', database='master', username='wrong_username', password='sqream', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='master', username='wrong_username',
+                                  password='sqream', use_ssl=False, access_token=_access_token)
         except Exception as e:
             if "role \'wrong_username\' doesn't exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong password")
         try:
-            pysqream_blue.connect(host=self.domain, port='443', database='master', username='sqream', password='wrong_pw', use_ssl=False)
+            pysqream_blue.connect(host=self.domain, port='443', database='master', username='sqream',
+                                  password='wrong_pw', use_ssl=False, access_token=_access_token)
         except Exception as e:
             if "wrong password for role 'sqream'" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
@@ -605,7 +612,7 @@ class TestTimeout(TestBaseWithoutBeforeAfter):
         con = None
         try:
             Logger().info("test_timeout after 120 seconds")
-            con = pysqream_blue.connect(host=self.domain, use_ssl=False, query_timeout=120)
+            con = pysqream_blue.connect(host=self.domain, use_ssl=False, query_timeout=120, access_token=_access_token)
             cur = con.cursor()
             cur.execute("select sleep(200)")
         except Exception as e:
@@ -624,7 +631,7 @@ class TestNoTimeout(TestBaseWithoutBeforeAfter):
             Logger().info("test_no_timeout")
             start_time = datetime.now()
             Logger().info(start_time)
-            con = pysqream_blue.connect(host=self.domain, use_ssl=False)
+            con = pysqream_blue.connect(host=self.domain, use_ssl=False, access_token=_access_token)
             cur = con.cursor()
             cur.execute("select sleep(200)")
             end_time = datetime.now()

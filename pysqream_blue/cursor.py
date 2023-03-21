@@ -3,7 +3,7 @@ from pysqream_blue.globals import qh_messages, dbapi_typecodes, type_to_v1_tpye,
 import time
 from pysqream_blue.logger import *
 from pysqream_blue.utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
-    DatabaseError, InterfaceError, Warning, Error
+    DatabaseError, InterfaceError, Warning, Error, is_token_expired
 from collections.abc import Sequence
 import json
 from pysqream_blue.casting import *
@@ -56,15 +56,15 @@ class Cursor:
         except grpc.RpcError as rpc_error:
             log_and_raise(ProgrammingError,
                           f'Context id: {self.stmt_id}. Error from grpc while attempting to cancel the query.\n{rpc_error}')
-        if self.client.is_token_expored(cancel_response.error):
-            auth_response = self.client.auth_access_token()
-            self.client.token = auth_response.token
-            self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-            cancel_response: qh_messages.CancelResponse = self._cancel()
+            if is_token_expired(str(rpc_error)):
+                auth_response = self.client.auth_access_token()
+                self.client.token = auth_response.token
+                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+                cancel_response: qh_messages.CancelResponse = self._cancel()
 
-        if cancel_response.HasField('error'):
-            log_and_raise(OperationalError,
-                          f'Context id: {self.stmt_id}. Error while attempting to cancel the query.\n{cancel_response.error}')
+            if cancel_response.HasField('error'):
+                log_and_raise(OperationalError,
+                              f'Context id: {self.stmt_id}. Error while attempting to cancel the query.\n{cancel_response.error}')
 
         log_info(f'Context id: {self.stmt_id}. The query was successfully canceled. query type: {self.query_type}.')
         return cancel_response
@@ -119,17 +119,18 @@ class Cursor:
         return self.stmt_id
 
     def _request_compile(self, query: str):
+        response: qh_messages.CompileResponse = None
         try:
             response: qh_messages.CompileResponse = self._compile(query)
         except grpc.RpcError as rpc_error:
             log_and_raise(ProgrammingError,
                           f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
 
-        if self.client.is_token_expored(response.error):
-            auth_response = self.client.auth_access_token()
-            self.client.token = auth_response.token
-            self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-            response: qh_messages.CompileResponse = self._compile(query)
+            if is_token_expired(str(rpc_error)):
+                auth_response = self.client.auth_access_token()
+                self.client.token = auth_response.token
+                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+                response: qh_messages.CompileResponse = self._compile(query)
 
         if response.HasField('error'):
             log_and_raise(OperationalError,
@@ -153,11 +154,11 @@ class Cursor:
             log_and_raise(ProgrammingError,
                           f'Query id: {self.stmt_id}. Error from grpc while attempting to execute the query.\n{rpc_error}')
 
-        if self.client.is_token_expored(execute_response.error):
-            auth_response = self.client.auth_access_token()
-            self.client.token = auth_response.token
-            self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-            execute_response: qh_messages.ExecuteResponse = self._execute()
+            if is_token_expired(str(rpc_error)):
+                auth_response = self.client.auth_access_token()
+                self.client.token = auth_response.token
+                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+                execute_response: qh_messages.ExecuteResponse = self._execute()
 
         if execute_response.HasField('error'):
             log_and_raise(OperationalError,
@@ -182,11 +183,11 @@ class Cursor:
                 log_and_raise(ProgrammingError,
                               f'Query id: {self.stmt_id}. Error from grpc while attempting to get query status.\n{rpc_error}')
 
-            if self.client.is_token_expored(status_response.error):
-                auth_response = self.client.auth_access_token()
-                self.client.token = auth_response.token
-                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-                status_response: qh_messages.StatusResponse = self._status()
+                if is_token_expired(str(rpc_error)):
+                    auth_response = self.client.auth_access_token()
+                    self.client.token = auth_response.token
+                    self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+                    status_response: qh_messages.StatusResponse = self._status()
 
             if status_response.status == qh_messages.QUERY_EXECUTION_STATUS_ABORTED:
                 log_info(f"Query id {self.stmt_id} is aborted")
@@ -245,11 +246,11 @@ class Cursor:
             log_and_raise(ProgrammingError,
                           f'Query id: {self.stmt_id}. Error from grpc while attempting to fetch the results.\n{rpc_error}')
 
-        if self.client.is_token_expored(fetch_response.error):
-            auth_response = self.client.auth_access_token()
-            self.client.token = auth_response.token
-            self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-            fetch_response: qh_messages.FetchResponse = self._fetch()
+            if is_token_expired(str(rpc_error)):
+                auth_response = self.client.auth_access_token()
+                self.client.token = auth_response.token
+                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+                fetch_response: qh_messages.FetchResponse = self._fetch()
 
         if fetch_response.HasField('error'):
             log_and_raise(OperationalError,
@@ -342,17 +343,17 @@ class Cursor:
         self.parsed_row_amount = 0
 
     def close(self):
+        response: qh_messages.CloseResponse = None
         try:
             response: qh_messages.CloseResponse = self._close()
         except grpc.RpcError as rpc_error:
             log_error(f'Query id: {self.stmt_id}. Error from grpc while attempting to close the query.\n{rpc_error}')
-            return
 
-        if self.client.is_token_expored(response.error):
-            auth_response = self.client.auth_access_token()
-            self.client.token = auth_response.token
-            self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-            response: qh_messages.CloseResponse = self._close()
+            if is_token_expired(str(rpc_error)):
+                auth_response = self.client.auth_access_token()
+                self.client.token = auth_response.token
+                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+                response: qh_messages.CloseResponse = self._close()
 
         if response.HasField('error'):
             log_warning(f'Query id: {self.stmt_id}. Error while attempting to close the query.\n{response.error}')
