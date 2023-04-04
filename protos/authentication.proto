@@ -6,24 +6,44 @@ option java_multiple_files = true;
 
 import "protos/error.proto";
 import "protos/client_info.proto";
+import "protos/authentication_type.proto";
 
-service AuthenticationService { rpc Auth(AuthRequest) returns (AuthResponse); }
+service AuthenticationService {
+    rpc Auth(AuthRequest) returns (AuthResponse);
+    rpc Session(SessionRequest) returns (SessionResponse);
+    rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+}
 
 message AuthRequest {
-  string user = 1;
-  string password = 2;
-  string tenant_id = 3;
-  string database = 4;
-  string source_ip = 5;
-  ClientInfo client_info = 6;
-  map<string, string> client_params = 7;
+  AuthenticationType auth_type = 1;
+  string user = 2;
+  string password = 3;
+  string access_token = 4;
 }
 
 message AuthResponse {
   string token = 1;
-  string token_type = 2;
-  int64 exp_time = 3;
-  string context_id = 4;
-  Error error = 5;
-  string sqream_version = 6;
+  Error error = 2;
+}
+
+message SessionRequest {
+  string tenant_id = 1;
+  string database = 2;
+  string source_ip = 3;
+  ClientInfo client_info = 4;
+}
+
+message SessionResponse {
+  string context_id = 1;
+  Error error = 2;
+  string sqream_version = 3;
+}
+
+message RefreshTokenRequest{
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse{
+  string access_token = 1;
+  Error error = 2;
 }
