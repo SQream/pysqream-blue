@@ -17,12 +17,12 @@ setup_params = dict(
     author_email = "info@sqream.com",
     packages = ["pysqream_blue", "protos"],
     classifiers = [
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
     keywords = 'database db-api sqream sqreamdbV2',
-    python_requires = '>=3.7',
+    python_requires = '>=3.9',
     install_requires=requires
 )
 

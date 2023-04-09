@@ -3,7 +3,7 @@
 Python connector for SQream DB Blue
 ===================================
 
-* **Version:**  1.0.24
+* **Version:**  1.0.25
 
 * **Supported SQream DB versions:** >= Blue cloud
 
@@ -13,14 +13,14 @@ The SQream Python connector provides an interface for creating and running Pytho
 
 pysqream conforms to Python DB-API specifications `PEP-249 <https://www.python.org/dev/peps/pep-0249/>`_
 
-``pysqream_blue`` is native and pure Python, with minimal requirements. It can be installed with ``pip`` on any operating system, including Linux, Windows, and macOS.
+``pysqream_blue`` is native and pure Python, with minimal requirements. It can be installed with ``pip3`` on any operating system, including Linux, Windows, and macOS.
 
 .. For more information and a full API reference, see `SQream documentation's pysqream blue guide <https://sqream-docs.readthedocs.io/en/latest/guides/client_drivers/python/index.html>`_ .
 
 Requirements
 -------------
 
-* Python 3.6.5+, with 3.7+ highly recommended
+* Python 3.9+
 
 Installing the Python connector
 --------------------------------
@@ -31,25 +31,22 @@ Prerequisites
 1. Python
 ^^^^^^^^^^^^
 
-The connector requires Python 3.6.5 or newer. To verify your version of Python:
+The connector requires Python 3.9 or newer. To verify your version of Python:
 
 .. code-block:: console
 
    $ python --version
-   Python 3.7.3
-
-
-Note: If both Python 2.x and 3.x are installed, you can run ``python3`` and ``pip3`` instead of ``python`` and ``pip`` respectively for the rest of this guide
+   Python 3.9
 
 2. PIP
 ^^^^^^^^^^^^
-The Python connector is installed via ``pip``, the Python package manager and installer.
+The Python connector is installed via ``pip3``, the Python package manager and installer.
 
-We recommend upgrading to the latest version of ``pip`` before installing. To verify that you are on the latest version, run the following command:
+We recommend upgrading to the latest version of ``pip3`` before installing. To verify that you are on the latest version, run the following command:
 
 .. code-block:: console
 
-   $ python -m pip install --upgrade pip
+   $ python -m pip3 install --upgrade pip
    Collecting pip
       Downloading https://files.pythonhosted.org/packages/00/b6/9cfa56b4081ad13874b0c6f96af8ce16cfbc1cb06bedf8e9164ce5551ec1/pip-19.3.1-py2.py3-none-any.whl (1.4MB)
         |████████████████████████████████| 1.4MB 1.6MB/s
@@ -69,13 +66,13 @@ Install via pip
 
 The Python connector is available via `PyPi <https://pypi.org/project/pysqream/>`_.
 
-Install the connector with ``pip``:
+Install the connector with ``pip3``:
 
 .. code-block:: console
 
-   $ pip install pysqream-blue
+   $ pip3 install pysqream-blue
 
-``pip`` will automatically installs all necessary libraries and modules.
+``pip3`` will automatically installs all necessary libraries and modules.
 
 Validate the installation
 -----------------------------
