@@ -96,6 +96,7 @@ class Connection:
         auth_response: auth_messages.AuthResponse = None
         session_response: auth_messages.SessionResponse = None
         try:
+            print(self.access_token)
             if self.access_token is None:
                 auth_response = self.auth_user_password()
             else:

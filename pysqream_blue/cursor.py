@@ -82,6 +82,7 @@ class Cursor:
         log_and_raise(NotSupportedError, "Parametered queries currently not supported.")
 
     def fetchmany(self, size):
+        print("fetchmany")
         size = size or self.arraysize
         # self._verify_open()
         if not self.statement_opened or self.query_type not in (None, qh_messages.QUERY_TYPE_QUERY):
@@ -97,7 +98,7 @@ class Cursor:
         if len(res):
             return res
 
-        return None
+        return []
 
     def fetchone(self, bad_args=False):
         ''' Fetch one result row '''
