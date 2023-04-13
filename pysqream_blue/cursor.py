@@ -97,7 +97,7 @@ class Cursor:
         if len(res):
             return res
 
-        return None
+        return []
 
     def fetchone(self, bad_args=False):
         ''' Fetch one result row '''
