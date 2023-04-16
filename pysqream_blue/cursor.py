@@ -97,7 +97,7 @@ class Cursor:
         if len(res):
             return res
 
-        return [()]
+        return []
 
     def fetchone(self, bad_args=False):
         ''' Fetch one result row '''
@@ -106,7 +106,7 @@ class Cursor:
             log_and_raise(ProgrammingError, "Bad argument to fetchone()")
 
         res = self.fetchmany(1)
-        return None if not res[0] else res
+        return None if not res else res
 
     def fetchall(self, bad_args=False):
         ''' Fetch all result rows '''
