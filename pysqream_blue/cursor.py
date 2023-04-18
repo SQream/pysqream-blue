@@ -97,7 +97,7 @@ class Cursor:
         if len(res):
             return res
 
-        return None
+        return []
 
     def fetchone(self, bad_args=False):
         ''' Fetch one result row '''
@@ -105,15 +105,16 @@ class Cursor:
         if bad_args:
             log_and_raise(ProgrammingError, "Bad argument to fetchone()")
 
-        return self.fetchmany(1)
+        res = self.fetchmany(1)
+        return None if not res else res
 
     def fetchall(self, bad_args=False):
         ''' Fetch all result rows '''
 
         if bad_args:
             log_and_raise(ProgrammingError, "Bad argument to fetchall()")
-        res = self.fetchmany(-1)
-        return res
+
+        return self.fetchmany(-1)
 
     def get_statement_id(self):
         return self.stmt_id
