@@ -31,6 +31,7 @@ message SessionRequest {
   string database = 2;
   string source_ip = 3;
   ClientInfo client_info = 4;
+  string pool_name = 5;
 }
 
 message SessionResponse {

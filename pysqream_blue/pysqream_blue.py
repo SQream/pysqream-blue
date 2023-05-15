@@ -17,12 +17,13 @@ def connect(host:      str,
             access_token: str = None,
             reconnect_attempts : int = 10,
             reconnect_interval : int = 3,
-            query_timeout      : int = 0
+            query_timeout      : int = 0,
+            pool_name: str = None
             ) -> Connection:
     ''' Connect to SQream database '''
 
     conn = Connection(host, port, use_ssl, log=log, is_base_connection=True, reconnect_attempts=reconnect_attempts,
-                      reconnect_interval=reconnect_interval, query_timeout=query_timeout)
+                      reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
     conn.connect_database(database, username, password, tenant_id, service, access_token)
 
     return conn
