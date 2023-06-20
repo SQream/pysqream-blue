@@ -11,7 +11,8 @@ class Connection:
     ''' Connection class used to interact with SQream '''
 
     def __init__(self, host: str, port: str, use_ssl: bool = True, log = False, is_base_connection: bool = True,
-                 reconnect_attempts : int = 10, reconnect_interval : int = 3, query_timeout: int = 0):
+                 reconnect_attempts : int = 10, reconnect_interval : int = 3, query_timeout: int = 0,
+                 pool_name: str = None):
         self.host, self.port, self.use_ssl = host, port, use_ssl
         # Product want to connect with SSL
         self.use_ssl = True
@@ -21,6 +22,7 @@ class Connection:
         self.session_opened = False
         self.statement_opened = False
         self.query_timeout = query_timeout
+        self.pool_name = pool_name
 
         self.is_base_connection = is_base_connection
         if is_base_connection:
@@ -136,7 +138,8 @@ class Connection:
             tenant_id=self.tenant_id,
             database=self.database,
             source_ip=socket.gethostbyname(socket.gethostname()),
-            client_info=cl_messages.ClientInfo(version='PySQream2_V_111')
+            client_info=cl_messages.ClientInfo(version='PySQream2_V_111'),
+            pool_name=self.pool_name
         ), credentials=grpc.access_token_call_credentials(self.token))
         return session_response
 
