@@ -337,7 +337,7 @@ class Cursor:
                 else:
                     row.append(col_data[-1][i])
 
-            self.parsed_rows.append(row)
+            self.parsed_rows.append(tuple(row))
 
         self.data_columns = []
         log_info(f'Query id: {self.stmt_id}, {self.parsed_row_amount} rows parsed.')
