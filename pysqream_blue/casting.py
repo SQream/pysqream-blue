@@ -1,5 +1,6 @@
 from datetime import datetime, date, time as t
 from decimal import Decimal, getcontext
+from math import pow
 
 
 def sq_date_to_py_date(sqream_date: int, date_convert_func=date) -> date:
@@ -42,7 +43,8 @@ def sq_datetime_to_py_datetime(sqream_datetime: int, dt_convert_func=datetime) -
     hour = time_part // 1000 // 60 // 60
 
     return dt_convert_func(date_part.year, date_part.month, date_part.day,
-                           hour, mins, sec, msec)
+                           hour, mins, sec, msec * int(pow(10, 3))) # Python expects to get 6 digit on
+                                                                     # miliseconds while SQream returns 3.
 
 
 tenth = Decimal("0.1")
