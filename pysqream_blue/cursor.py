@@ -241,17 +241,23 @@ class Cursor:
 
     def _request_fetch(self):
         fetch_response = None
-        try:
-            fetch_response: qh_messages.FetchResponse = self._fetch()
-        except grpc.RpcError as rpc_error:
-            log_and_raise(ProgrammingError,
-                          f'Query id: {self.stmt_id}. Error from grpc while attempting to fetch the results.\n{rpc_error}')
-
-            if is_token_expired(str(rpc_error)):
-                auth_response = self.client.auth_access_token()
-                self.client.token = auth_response.token
-                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+        retry = True
+        while retry:
+            try:
                 fetch_response: qh_messages.FetchResponse = self._fetch()
+                retry = fetch_response.retry_fetch
+            except grpc.RpcError as rpc_error:
+                retry = False
+                log_and_raise(ProgrammingError,
+                              f'Query id: {self.stmt_id}. Error from grpc while attempting to fetch the results.\n{rpc_error}')
+
+                if is_token_expired(str(rpc_error)):
+                    log_info("Token expired on the middle of fetch, try to fetch again")
+                    auth_response = self.client.auth_access_token()
+                    self.client.token = auth_response.token
+                    self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
+                    fetch_response: qh_messages.FetchResponse = self._fetch()
+                    retry = fetch_response.retry_fetch
 
         if fetch_response.HasField('error'):
             log_and_raise(OperationalError,
