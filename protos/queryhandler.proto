@@ -59,6 +59,7 @@ message FetchRequest { string context_id = 1; }
 message FetchResponse {
   bytes query_result = 1;
   Error error = 2;
+  bool retry_fetch = 3;
 }
 
 message CloseStatementRequest { CloseRequest close_request = 1; }
