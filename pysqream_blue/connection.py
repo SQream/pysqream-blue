@@ -82,12 +82,12 @@ class Connection:
         self.connected = False
         log_info(f'Connection closed to the server at: {self.host}:{self.port}.')
 
-    def connect_database(self, database: str, username: str, password: str, tenant_id: str, service: str,
+    def connect_database(self, database: str, tenant_id: str, service: str,
                          access_token: str):
         """Authentication and token receipt"""
 
-        self.database, self.username, self.password, self.tenant_id, self.service, self.access_token = \
-            database, username, password, tenant_id, service, access_token
+        self.database, self.tenant_id, self.service, self.access_token = \
+            database, tenant_id, service, access_token
 
         if self.session_opened:
             ''' user should not reconnect before closing the previous connection'''
@@ -98,10 +98,7 @@ class Connection:
         auth_response: auth_messages.AuthResponse = None
         session_response: auth_messages.SessionResponse = None
         try:
-            if self.access_token is None:
-                auth_response = self.auth_user_password()
-            else:
-                auth_response = self.auth_access_token()
+            auth_response = self.auth_access_token()
         except grpc.RpcError as rpc_error:
             log_and_raise(ProgrammingError,
                           f'Error from grpc while attempting to open database connection.\n{rpc_error}')
@@ -131,7 +128,7 @@ class Connection:
         # self.expiration_time = hour + time.time() * 1000
         self.call_credentialds = grpc.access_token_call_credentials(self.token)
         self.session_opened = True
-        log_info(f'''Connection opened to database {database}. username: {self.username}.''')
+        log_info(f'''Connection opened to database {database}.''')
 
     def open_session(self):
         session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
@@ -143,16 +140,8 @@ class Connection:
         ), credentials=grpc.access_token_call_credentials(self.token))
         return session_response
 
-    def auth_user_password(self) -> auth_messages.AuthResponse:
-        return self.auth_stub.Auth(auth_messages.AuthRequest(
-            auth_type=auth_type_messages.AUTHENTICATION_TYPE_INTERNAL,
-            user=self.username,
-            password=self.password
-        ))
-
     def auth_access_token(self) -> auth_messages.AuthResponse:
         return self.auth_stub.Auth(auth_messages.AuthRequest(
-            auth_type=auth_type_messages.AUTHENTICATION_TYPE_IDP,
             access_token=self.access_token
         ))
 
@@ -201,9 +190,6 @@ class Connection:
 
         if not self.session_opened:
             log_and_raise(ProgrammingError, 'Session has been closed')
-        # if self.expiration_time - time.time() * 1000 < 10000:
-        #     self.session_opened = False
-        #     self.connect_database(self.database, self.username, self.password, self.tenant_id, self.service, self.access_token)
 
     def commit(self):
         return None
