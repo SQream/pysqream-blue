@@ -14,10 +14,9 @@ _sym_db = _symbol_database.Default()
 
 from protos import error_pb2 as protos_dot_error__pb2
 from protos import client_info_pb2 as protos_dot_client__info__pb2
-from protos import authentication_type_pb2 as protos_dot_authentication__type__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1bprotos/authentication.proto\x12\x1d\x63om.sqream.cloud.generated.v1\x1a\x12protos/error.proto\x1a\x18protos/client_info.proto\x1a protos/authentication_type.proto\"\x89\x01\n\x0b\x41uthRequest\x12\x44\n\tauth_type\x18\x01 \x01(\x0e\x32\x31.com.sqream.cloud.generated.v1.AuthenticationType\x12\x0c\n\x04user\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\x12\x14\n\x0c\x61\x63\x63\x65ss_token\x18\x04 \x01(\t\"R\n\x0c\x41uthResponse\x12\r\n\x05token\x18\x01 \x01(\t\x12\x33\n\x05\x65rror\x18\x02 \x01(\x0b\x32$.com.sqream.cloud.generated.v1.Error\"\x9b\x01\n\x0eSessionRequest\x12\x11\n\ttenant_id\x18\x01 \x01(\t\x12\x10\n\x08\x64\x61tabase\x18\x02 \x01(\t\x12\x11\n\tsource_ip\x18\x03 \x01(\t\x12>\n\x0b\x63lient_info\x18\x04 \x01(\x0b\x32).com.sqream.cloud.generated.v1.ClientInfo\x12\x11\n\tpool_name\x18\x05 \x01(\t\"r\n\x0fSessionResponse\x12\x12\n\ncontext_id\x18\x01 \x01(\t\x12\x33\n\x05\x65rror\x18\x02 \x01(\x0b\x32$.com.sqream.cloud.generated.v1.Error\x12\x16\n\x0esqream_version\x18\x03 \x01(\t\",\n\x13RefreshTokenRequest\x12\x15\n\rrefresh_token\x18\x01 \x01(\t\"a\n\x14RefreshTokenResponse\x12\x14\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\t\x12\x33\n\x05\x65rror\x18\x02 \x01(\x0b\x32$.com.sqream.cloud.generated.v1.Error2\xdb\x02\n\x15\x41uthenticationService\x12_\n\x04\x41uth\x12*.com.sqream.cloud.generated.v1.AuthRequest\x1a+.com.sqream.cloud.generated.v1.AuthResponse\x12h\n\x07Session\x12-.com.sqream.cloud.generated.v1.SessionRequest\x1a..com.sqream.cloud.generated.v1.SessionResponse\x12w\n\x0cRefreshToken\x12\x32.com.sqream.cloud.generated.v1.RefreshTokenRequest\x1a\x33.com.sqream.cloud.generated.v1.RefreshTokenResponseB\x02P\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1bprotos/authentication.proto\x12\x1d\x63om.sqream.cloud.generated.v1\x1a\x12protos/error.proto\x1a\x18protos/client_info.proto\"#\n\x0b\x41uthRequest\x12\x14\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\t\"R\n\x0c\x41uthResponse\x12\r\n\x05token\x18\x01 \x01(\t\x12\x33\n\x05\x65rror\x18\x02 \x01(\x0b\x32$.com.sqream.cloud.generated.v1.Error\"\x9b\x01\n\x0eSessionRequest\x12\x11\n\ttenant_id\x18\x01 \x01(\t\x12\x10\n\x08\x64\x61tabase\x18\x02 \x01(\t\x12\x11\n\tsource_ip\x18\x03 \x01(\t\x12>\n\x0b\x63lient_info\x18\x04 \x01(\x0b\x32).com.sqream.cloud.generated.v1.ClientInfo\x12\x11\n\tpool_name\x18\x05 \x01(\t\"r\n\x0fSessionResponse\x12\x12\n\ncontext_id\x18\x01 \x01(\t\x12\x33\n\x05\x65rror\x18\x02 \x01(\x0b\x32$.com.sqream.cloud.generated.v1.Error\x12\x16\n\x0esqream_version\x18\x03 \x01(\t\",\n\x13RefreshTokenRequest\x12\x15\n\rrefresh_token\x18\x01 \x01(\t\"a\n\x14RefreshTokenResponse\x12\x14\n\x0c\x61\x63\x63\x65ss_token\x18\x01 \x01(\t\x12\x33\n\x05\x65rror\x18\x02 \x01(\x0b\x32$.com.sqream.cloud.generated.v1.Error2\xdb\x02\n\x15\x41uthenticationService\x12_\n\x04\x41uth\x12*.com.sqream.cloud.generated.v1.AuthRequest\x1a+.com.sqream.cloud.generated.v1.AuthResponse\x12h\n\x07Session\x12-.com.sqream.cloud.generated.v1.SessionRequest\x1a..com.sqream.cloud.generated.v1.SessionResponse\x12w\n\x0cRefreshToken\x12\x32.com.sqream.cloud.generated.v1.RefreshTokenRequest\x1a\x33.com.sqream.cloud.generated.v1.RefreshTokenResponseB\x02P\x01\x62\x06proto3')
 
 
 
@@ -74,18 +73,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'P\001'
-  _AUTHREQUEST._serialized_start=143
-  _AUTHREQUEST._serialized_end=280
-  _AUTHRESPONSE._serialized_start=282
-  _AUTHRESPONSE._serialized_end=364
-  _SESSIONREQUEST._serialized_start=367
-  _SESSIONREQUEST._serialized_end=522
-  _SESSIONRESPONSE._serialized_start=524
-  _SESSIONRESPONSE._serialized_end=638
-  _REFRESHTOKENREQUEST._serialized_start=640
-  _REFRESHTOKENREQUEST._serialized_end=684
-  _REFRESHTOKENRESPONSE._serialized_start=686
-  _REFRESHTOKENRESPONSE._serialized_end=783
-  _AUTHENTICATIONSERVICE._serialized_start=786
-  _AUTHENTICATIONSERVICE._serialized_end=1133
+  _AUTHREQUEST._serialized_start=108
+  _AUTHREQUEST._serialized_end=143
+  _AUTHRESPONSE._serialized_start=145
+  _AUTHRESPONSE._serialized_end=227
+  _SESSIONREQUEST._serialized_start=230
+  _SESSIONREQUEST._serialized_end=385
+  _SESSIONRESPONSE._serialized_start=387
+  _SESSIONRESPONSE._serialized_end=501
+  _REFRESHTOKENREQUEST._serialized_start=503
+  _REFRESHTOKENREQUEST._serialized_end=547
+  _REFRESHTOKENRESPONSE._serialized_start=549
+  _REFRESHTOKENRESPONSE._serialized_end=646
+  _AUTHENTICATIONSERVICE._serialized_start=649
+  _AUTHENTICATIONSERVICE._serialized_end=996
 # @@protoc_insertion_point(module_scope)

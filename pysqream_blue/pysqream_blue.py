@@ -10,8 +10,6 @@ def connect(host:      str,
             use_ssl:   bool = True,
             log              = False,
             database:  str =  'master',
-            username:  str =  'sqream',
-            password:  str =  'sqream',
             tenant_id: str =  'tenant',
             service:   str =  'sqream',
             access_token: str = None,
@@ -24,7 +22,7 @@ def connect(host:      str,
 
     conn = Connection(host, port, use_ssl, log=log, is_base_connection=True, reconnect_attempts=reconnect_attempts,
                       reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
-    conn.connect_database(database, username, password, tenant_id, service, access_token)
+    conn.connect_database(database, tenant_id, service, access_token)
 
     return conn
 

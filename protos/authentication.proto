@@ -6,7 +6,6 @@ option java_multiple_files = true;
 
 import "protos/error.proto";
 import "protos/client_info.proto";
-import "protos/authentication_type.proto";
 
 service AuthenticationService {
     rpc Auth(AuthRequest) returns (AuthResponse);
@@ -15,10 +14,7 @@ service AuthenticationService {
 }
 
 message AuthRequest {
-  AuthenticationType auth_type = 1;
-  string user = 2;
-  string password = 3;
-  string access_token = 4;
+  string access_token = 1;
 }
 
 message AuthResponse {

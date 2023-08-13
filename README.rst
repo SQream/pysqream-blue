@@ -3,7 +3,7 @@
 Python connector for SQream DB Blue
 ===================================
 
-* **Version:**  1.0.31
+* **Version:**  1.0.32
 
 * **Supported SQream DB versions:** >= Blue cloud
 
@@ -87,20 +87,16 @@ Create a file called ``test.py`` (make sure to replace the parameters in the con
 
    """
    Connection parameters include:
-   * IP/Hostname
-   * Port
-   * database name
-   * username
-   * password
-   * Connect through load balancer, or direct to worker (Default: false - direct to worker)
+   * Domain
+   * Access Token
+   * Database
    * use SSL connection (default: false)
    * Optional service queue (default: 'sqream')
    """
 
    # Create a connection object
 
-   con = pysqream_blue.connect(host='127.0.0.1', port='80',
-                               database='master', username='sqream', password='sqream')
+   con = pysqream_blue.connect(host='4-4.isqream.com', database='master', access_token='fdllaj34320fnda...')
 
    # Create a new cursor
    cur = con.cursor()
@@ -128,13 +124,13 @@ To enable logging, pass a path to a log file in the connection string as follows
 
 .. code-block:: python
 
-   con = pysqream_blue.connect('127.0.0.1', '80', log = '/path/to/logfile.xx')
+   con = pysqream_blue.connect(host='4-4.isqream.com', database='master', access_token='fdllaj34320fnda...', log = '/path/to/logfile.xx')
 
 Or pass True to save to `'/tmp/sqream_dbapi.log'`:
 
 .. code-block:: python
 
-   con = pysqream_blue.connect('127.0.0.1', '80', log =True)
+   con = pysqream_blue.connect(host='4-4.isqream.com', database='master', access_token='fdllaj34320fnda...', log =True)
 
 
 
