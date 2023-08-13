@@ -1,6 +1,6 @@
 from pysqream_blue.logger import *
 import grpc
-from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages
+from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages
 import time
 import socket
 from pysqream_blue.utils import is_token_expired
