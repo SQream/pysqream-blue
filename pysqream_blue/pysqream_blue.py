@@ -3,7 +3,10 @@
 import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
+import os
 # from pysqream_blue.connection import qh_messages
+
+os.environ['export GRPC_POLL_STRATEGY'] = 'epoll1'
 
 def connect(host:      str,
             port:      str =  '443',
