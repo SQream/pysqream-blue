@@ -124,18 +124,24 @@ class Cursor:
         try:
             response: qh_messages.CompileResponse = self._compile(query)
         except grpc.RpcError as rpc_error:
+            log_error(f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
 
-            if is_token_expired(str(rpc_error)) or 'Stream removed' in str(rpc_error):
-                log_info(f"Retry compile query for {query}")
-                auth_response = self.client.auth_access_token()
-                self.client.token = auth_response.token
-                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-                try:
+            try:
+                if is_token_expired(str(rpc_error)):
+                    log_info(f"got {rpc_error} try to retry compile for query {query}")
+                    # TODO - fix error - QueryHandlerServiceStub' object has no attribute 'auth_access_token
+                    auth_response = self.client.auth_access_token()
+                    self.client.token = auth_response.token
+                    self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
                     response: qh_messages.CompileResponse = self._compile(query)
-                except grpc.RpcError as rpc_error:
+
+                elif 'Stream removed' in str(rpc_error):
+                    log_info(f"got {rpc_error} try to retry compile for query {query}")
+                    response: qh_messages.CompileResponse = self._compile(query)
+                else:
                     log_and_raise(ProgrammingError,
                                   f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
-            else:
+            except grpc.RpcError as rpc_error:
                 log_and_raise(ProgrammingError,
                               f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
 
