@@ -1,3 +1,4 @@
+
 from pysqream_blue.logger import *
 import grpc
 from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages
@@ -44,8 +45,8 @@ class Connection:
         while True:
             try:
                 options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
-                           ('grpc.keepalive_time_ms', 10000), ('grpc.keepalive_timeout_ms', 5000),
-                           ('grpc.keepalive_permit_without_calls', True)]
+                           ('grpc.keepalive_time_ms', 10000), ('grpc.keepalive_timeout_ms', 2000),
+                           ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True)]
                 if self.use_ssl:
                     options.append(("grpc.enable_http_proxy", 0))
                     self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
