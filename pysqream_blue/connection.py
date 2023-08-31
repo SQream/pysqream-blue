@@ -30,8 +30,8 @@ class Connection:
             self.cursors = []
             self._connect_to_server()
 
-        if log is not False:
-            start_logging(None if log is True else log)
+        # if log is not False:
+        #     start_logging(None if log is True else log)
 
     def __del__(self):
         self._disconnect_server()

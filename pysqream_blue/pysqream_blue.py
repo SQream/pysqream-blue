@@ -4,6 +4,7 @@ import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
 import os
+from pysqream_blue.logger import *
 # from pysqream_blue.connection import qh_messages
 
 os.environ['export GRPC_POLL_STRATEGY'] = 'epoll1'
@@ -24,6 +25,9 @@ def connect(host:      str,
             pool_name: str = None
             ) -> Connection:
     ''' Connect to SQream database '''
+
+    if log is not False:
+        start_logging(None if log is True else log)
 
     conn = Connection(host, port, use_ssl, log=log, is_base_connection=True, reconnect_attempts=reconnect_attempts,
                       reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
