@@ -7,7 +7,7 @@ import os
 from pysqream_blue.logger import *
 # from pysqream_blue.connection import qh_messages
 
-os.environ['export GRPC_POLL_STRATEGY'] = 'epoll1'
+os.environ['export GRPC_POLL_STRATEGY'] = 'poll'
 
 def connect(host:      str,
             port:      str =  '443',
