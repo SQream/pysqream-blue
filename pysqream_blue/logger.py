@@ -8,7 +8,7 @@ logger.disabled = True
 
 
 def start_logging(log_path=None):
-    log_path = log_path or '/tmp/sqream_dbapi.log'
+    log_path = log_path or '/var/log/sqream_dbapi.log'
     logger.disabled = False
     try:
         handler = logging.FileHandler(log_path)
