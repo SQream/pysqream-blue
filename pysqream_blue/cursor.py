@@ -135,12 +135,11 @@ class Cursor:
                     self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
                     response: qh_messages.CompileResponse = self._compile(query)
 
-                # elif 'Stream removed' in str(rpc_error):
-                #     log_info(f"got {rpc_error} try to retry compile for query {query}")
-                #     response: qh_messages.CompileResponse = self._compile(query)
+                elif 'Stream removed' in str(rpc_error):
+                    log_info(f"got {rpc_error} try to retry compile for query {query}")
+                    response: qh_messages.CompileResponse = self._compile(query)
                 else:
-                    log_and_raise(ProgrammingError,
-                                  f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
+                    raise ProgrammingError(f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
             except grpc.RpcError as rpc_error:
                 log_and_raise(ProgrammingError,
                               f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
