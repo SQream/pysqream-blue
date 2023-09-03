@@ -1,3 +1,4 @@
+
 from pysqream_blue.logger import *
 import grpc
 from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages
@@ -29,8 +30,8 @@ class Connection:
             self.cursors = []
             self._connect_to_server()
 
-        if log is not False:
-            start_logging(None if log is True else log)
+        # if log is not False:
+        #     start_logging(None if log is True else log)
 
     def __del__(self):
         self._disconnect_server()
@@ -43,10 +44,13 @@ class Connection:
         try_connect_num = 0
         while True:
             try:
-                options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3)]
+                options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
+                           ('grpc.keepalive_time_ms', 1000), ('grpc.keepalive_timeout_ms', 2000),
+                           ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True)]
                 if self.use_ssl:
                     options.append(("grpc.enable_http_proxy", 0))
-                    self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(), options=options)
+                    self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
+                                                       options=options)
                 else:
                     self.channel = grpc.insecure_channel(f'{self.host}:{self.port}', options=options)
                 self.auth_stub = auth_services.AuthenticationServiceStub(self.channel)
@@ -185,6 +189,7 @@ class Connection:
             log_error(f'Error while attempting to close database connection.\n{close_response.error}')
 
         self.session_opened = False
+        self.channel.close()
         log_info(f'Connection closed to database {self.database}.')
 
     def _close(self):
