@@ -12,7 +12,7 @@ os.environ['export GRPC_POLL_STRATEGY'] = 'poll'
 def connect(host:      str,
             port:      str =  '443',
             use_ssl:   bool = True,
-            log              = True,
+            log              = False,
             database:  str =  'master',
             username:  str =  'sqream',
             password:  str =  'sqream',
