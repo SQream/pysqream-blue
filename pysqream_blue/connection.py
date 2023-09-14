@@ -49,7 +49,7 @@ class Connection:
                            # ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True)
                            ]
                 if self.use_ssl:
-                    options.append(("grpc.enable_http_proxy", 0))
+                    # options.append(("grpc.enable_http_proxy", 0))
                     self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
                                                        options=options)
                 else:
