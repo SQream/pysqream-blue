@@ -142,7 +142,7 @@ class Connection:
         session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
             tenant_id=self.tenant_id,
             database=self.database,
-            source_ip=socket.gethostbyname(socket.gethostname()),
+            source_ip=socket.gethostbyname('192.168.4.4'),
             client_info=cl_messages.ClientInfo(version='PySQream2_V_111'),
             pool_name=self.pool_name
         ), credentials=grpc.access_token_call_credentials(self.token))

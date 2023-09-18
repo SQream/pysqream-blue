@@ -8,6 +8,10 @@ from pysqream_blue.logger import *
 # from pysqream_blue.connection import qh_messages
 
 # os.environ['export GRPC_POLL_STRATEGY'] = 'poll'
+os.environ['export GRPC_ENABLE_FORK_SUPPORT'] = 'false'
+os.environ['export GRPC_VERBOSITY'] = 'DEBUG'
+os.environ['export GRPC_TRACE'] = 'all'
+
 
 def connect(host:      str,
             port:      str =  '443',
