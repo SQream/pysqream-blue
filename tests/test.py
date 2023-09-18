@@ -817,7 +817,134 @@ _queries = [
         """select distinct xnvarchar40 from t_a where xvarchar40 > 'm'""",
         """select top 5 xnvarchar40_not_null, len (xnvarchar40_not_null ) from t_g where len(xnvarchar40_not_null) < 15 order by xnvarchar40_not_null""",
         """select t_a.xint - subquery.new_num from t_a, (select xint,min(xint) as new_num from t_b group by xint) as subquery where t_a.xint = subquery.xint""",
-        """select count(*) from (select count(*) as counts from t_a inner join t_b on t_a.xint=t_b.xint) as res"""
+        """select count(*) from (select count(*) as counts from t_a inner join t_b on t_a.xint=t_b.xint) as res""",
+        'with cte0 as (select * from t_a) select count( * ) from cte0',
+        'with cte0 as (select * from t_a), cte1 as (select * from cte0) select count( * ) from cte1',
+        'with cte0 as (select xint from t_a where xint % 4=0) select * from cte0 t0 inner join cte0 t1 on t0.xint=t1.xint',
+        'with cte0(x) as (select xint from t_a) select count(x) from cte0 where x % 2=0',
+        'with t_a as (select * from t_b where xint % 2=0) select count( * ) from t_a',
+        'with cte0(x) as (select xvarchar40 from t_a) select x from cte0 where len(x) % 4=0',
+        'with cte0(x) as (select xnvarchar40 from t_a) select x from cte0 where len(x) % 4=0',
+        'with cte0 as (select * from (values (1)) t(x)) select * from cte0',
+        'with cte0(x) as (select * from (values (1)) t(x)) select * from cte0',
+        'with cte0(x) as (select 1) select * from cte0',
+        'select distinct xtext6 from t_e',
+        'select distinct xtextnull6 from t_e',
+        'select substring(xvarchar40, 2, 2) from t_a',
+        'select xvarchar40,isnull(ascii(rtrim(xvarchar40)),0) from t_a',
+        'select cast(substring(xnvarchar40,2,2) as nvarchar(40)) from t_a',
+        'select reverse(xnvarchar40) from t_a',
+        'select datepart(hour,xdatetime) from t_a',
+        'select datepart(day,xdate) from t_a',
+        'select xint,xint2 from t_a where xint2 is null',
+        'select xint,xint2 from t_a where xint2 is not null',
+        'select xint,xkey from t_a where xkey in (1,10)',
+        """select 1 + len('data') - 1""",
+        """select (3 * len('data')) / 3""",
+        """select substring('data',len('data')-2+1,2)""",
+        """select t_a.xint, t_b.xint from t_a join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select t_a.xint, t_b.xint from t_a left join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select top 5 t_a.xint, t_b.xint from t_a inner join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        'with cte0 as (select * from t_a) select count( * ) from cte0',
+        'with cte0 as (select * from t_a), cte1 as (select * from cte0) select count( * ) from cte1',
+        'with cte0 as (select xint from t_a where xint % 4=0) select * from cte0 t0 inner join cte0 t1 on t0.xint=t1.xint',
+        'with cte0(x) as (select xint from t_a) select count(x) from cte0 where x % 2=0',
+        'with t_a as (select * from t_b where xint % 2=0) select count( * ) from t_a',
+        'with cte0(x) as (select xvarchar40 from t_a) select x from cte0 where len(x) % 4=0',
+        'with cte0(x) as (select xnvarchar40 from t_a) select x from cte0 where len(x) % 4=0',
+        'with cte0 as (select * from (values (1)) t(x)) select * from cte0',
+        'with cte0(x) as (select * from (values (1)) t(x)) select * from cte0',
+        'with cte0(x) as (select 1) select * from cte0',
+        'select distinct xtext6 from t_e',
+        'select distinct xtextnull6 from t_e',
+        'select substring(xvarchar40, 2, 2) from t_a',
+        'select xvarchar40,isnull(ascii(rtrim(xvarchar40)),0) from t_a',
+        'select cast(substring(xnvarchar40,2,2) as nvarchar(40)) from t_a',
+        'select reverse(xnvarchar40) from t_a',
+        'select datepart(hour,xdatetime) from t_a',
+        'select datepart(day,xdate) from t_a',
+        'select xint,xint2 from t_a where xint2 is null',
+        'select xint,xint2 from t_a where xint2 is not null',
+        'select xint,xkey from t_a where xkey in (1,10)',
+        """select 1 + len('data') - 1""",
+        """select (3 * len('data')) / 3""",
+        """select substring('data',len('data')-2+1,2)""",
+        """select t_a.xint, t_b.xint from t_a join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select t_a.xint, t_b.xint from t_a left join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select top 5 t_a.xint, t_b.xint from t_a inner join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select distinct t_a.xint, t_b.xint from t_a inner join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select * from t_a join t_b on t_a.xint = t_b.xkey where t_a.xint=5""",
+        """select * from t_a join t_b on t_a.xkey = t_b.xint where t_a.xkey=5""",
+        """select t_a.xint, t_b.xint from t_a left join t_b on t_a.xint = t_b.xint and t_a.xint = t_b.xkey""",
+        """select * from t_a left join t_b on t_a.xint = t_b.xint and t_a.xint2 = t_b.xint""",
+        """select t_a.xint,t_b.xint from t_a right join t_b on t_a.xint = t_b.xint where t_a.xint < 100 and t_b.xint < 101 and t_a.xint2 = t_b.xint""",
+        """select xint + 1 from t_a where high_selectivity(xint*4>20)""",
+        """select xint from t_a where high_selectivity(xint%2=0)""",
+        """select xsmallint , xreal , xint from t_a where high_selectivity(xint - 100 > 84)""",
+        """select xreal , xint from t_a where high_selectivity(xint*2 > 50 and xreal*2 > 2)""",
+        """select t_b.xvarchar40 , t_b.xbit from t_b where high_selectivity(t_b.xbit = 0 and t_b.xvarchar40 like '%t')""",
+        """select count(*) as c2 from (select count(*) as c1 from t_a inner join t_b on t_a.xkey = t_b.xkey) as t1""",
+        """select 1 from t_a having count(1) > 0""",
+        """select 1 from t_a having count(1) > 0 and count(3) > 0""",
+        """select avg(32) from t_a having count(1) > 0 and count(3) > 0""",
+        """select min(1) as ans from t_a having count(1) > 0 and count(3) > 0 order by ans""",
+        """select 'a'||'a',cast(min(1) as varchar(2)) ||'2' as ans from t_a having count(1) > 0 and count(3) > 2 order by ans""",
+        """select t_a.xkey from t_a group by xkey having count(3) > 0 and count(5) > 0""",
+        """select sum(xkey) from t_a having count(3) > 0 and count(5) > 0""",
+        """select avg(xkey)+1 from t_a having count(3) > 0 and count(5) > 0 and count(3) > 0""",
+        """select cast(min(xkey) as varchar(2)) || cast(min(xkey) as varchar(2)), cast(min(1) as varchar(2)) ||'2' as ans from t_a having count(1) > 0 and count(3) > 2 order by ans""",
+        """select * from t_a order by xnvarchar40""",
+        """select xnvarchar40 from t_a order by xnvarchar40""",
+        """select xint, xnvarchar40 from t_a order by xnvarchar40""",
+        """select xnvarchar40 from t_a order by xnvarchar40 desc""",
+        """select xint, xnvarchar40 from t_a order by xnvarchar40 desc""",
+        """select top 1 xnvarchar40 from t_a order by xnvarchar40""",
+        """select top 1 xnvarchar40 from t_a order by xnvarchar40 desc""",
+        """select top 1 xint, xnvarchar40 from t_a order by xnvarchar40""",
+        """select top 1 xint, xnvarchar40 from t_a order by xnvarchar40 desc""",
+        """select top 5 xnvarchar40, len (xnvarchar40 ) from t_a order by xnvarchar40""",
+        """select top 5 xnvarchar40, len (xnvarchar40 ) from t_a where len(xnvarchar40) < 15 order by xnvarchar40""",
+        """select top 5 xnvarchar40, lower (xnvarchar40 ) from t_a order by xnvarchar40""",
+        """select xnvarchar40 from t_a group by xnvarchar40""",
+        """select xnvarchar40,count(xint) from t_a group by xnvarchar40""",
+        """select xnvarchar40,count(*) from t_a group by xnvarchar40""",
+        """select count(*),t_a.xvarchar40 from t_a,t_b where t_a.xvarchar40 = t_b.xvarchar40 group by t_a.xvarchar40""",
+        """select count(*),t_a.xvarchar40 from t_a where t_a.xvarchar40 not between '10050' and '10100' group by t_a.xvarchar40""",
+        """select xint2,xfloat,min(xnvarchar40) from t_a group by xint2,xfloat,xnvarchar40""",
+        """select distinct xvarchar40 from t_a where t_a.xint < 10""",
+        """select distinct xnvarchar40 from t_a""",
+        """select distinct xint,xtinyint,xsmallint,xbigint,xreal,xfloat,xnvarchar40,xdate,xdatetime,xbit from t_a where t_a.xint < 10""",
+        """select distinct xnvarchar40 from t_a where xvarchar40 > 'm'""",
+        """select top 5 xnvarchar40_not_null, len (xnvarchar40_not_null ) from t_g where len(xnvarchar40_not_null) < 15 order by xnvarchar40_not_null""",
+        """select t_a.xint - subquery.new_num from t_a, (select xint,min(xint) as new_num from t_b group by xint) as subquery where t_a.xint = subquery.xint""",
+        """select count(*) from (select count(*) as counts from t_a inner join t_b on t_a.xint=t_b.xint) as res""",
+        'with cte0 as (select * from t_a) select count( * ) from cte0',
+        'with cte0 as (select * from t_a), cte1 as (select * from cte0) select count( * ) from cte1',
+        'with cte0 as (select xint from t_a where xint % 4=0) select * from cte0 t0 inner join cte0 t1 on t0.xint=t1.xint',
+        'with cte0(x) as (select xint from t_a) select count(x) from cte0 where x % 2=0',
+        'with t_a as (select * from t_b where xint % 2=0) select count( * ) from t_a',
+        'with cte0(x) as (select xvarchar40 from t_a) select x from cte0 where len(x) % 4=0',
+        'with cte0(x) as (select xnvarchar40 from t_a) select x from cte0 where len(x) % 4=0',
+        'with cte0 as (select * from (values (1)) t(x)) select * from cte0',
+        'with cte0(x) as (select * from (values (1)) t(x)) select * from cte0',
+        'with cte0(x) as (select 1) select * from cte0',
+        'select distinct xtext6 from t_e',
+        'select distinct xtextnull6 from t_e',
+        'select substring(xvarchar40, 2, 2) from t_a',
+        'select xvarchar40,isnull(ascii(rtrim(xvarchar40)),0) from t_a',
+        'select cast(substring(xnvarchar40,2,2) as nvarchar(40)) from t_a',
+        'select reverse(xnvarchar40) from t_a',
+        'select datepart(hour,xdatetime) from t_a',
+        'select datepart(day,xdate) from t_a',
+        'select xint,xint2 from t_a where xint2 is null',
+        'select xint,xint2 from t_a where xint2 is not null',
+        'select xint,xkey from t_a where xkey in (1,10)',
+        """select 1 + len('data') - 1""",
+        """select (3 * len('data')) / 3""",
+        """select substring('data',len('data')-2+1,2)""",
+        """select t_a.xint, t_b.xint from t_a join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select t_a.xint, t_b.xint from t_a left join t_b on t_a.xint = t_b.xint where t_a.xint=5""",
+        """select top 5 t_a.xint, t_b.xint from t_a inner join t_b on t_a.xint = t_b.xint where t_a.xint=5"""
             ]
 
 
@@ -1006,24 +1133,27 @@ def fetch_all_results():
     return ParallelHandler.fetch_all_results()
 
 
-class TestBug(TestBase):
+class TestBug(TestBaseWithoutBeforeAfter):
 
     def test_rep(self):
 
-        multiple_queries = _queries[:10]
-        Logger().info(f"going to execute {len(multiple_queries)} queries")
-        len_fetch_expected = len(multiple_queries)
-        fetch_res_list = []
-        for index, query in enumerate(multiple_queries):
-            Logger().info(f"execute query number {index}")
-            register_request(FetchQuery(query, self.con))
-            execute()
-            time.sleep(0.2)
-            res = fetch_results(0)
-            fetch_res_list.append(res)
+        len_test = 10
+        Logger().info(f"going to execute {len(_queries)} queries, on {len_test} batches")
+        len_fetch_expected = len(_queries)
+        for i in range(len_test):
+            Logger().info(f"batch number {i}")
+            fetch_res_list = []
+            conn = connect_pysqream_blue("danielg.isqream.com")
+            for index, query in enumerate(_queries):
+                Logger().info(f"execute query number {index}")
+                register_request(FetchQuery(query, conn))
+                execute()
+                time.sleep(0.2)
+                res = fetch_results(0)
+                fetch_res_list.append(res)
 
-        self.con.close()
-        assert len_fetch_expected == len(fetch_res_list), f"count of results is not valid, expected to {len_fetch_expected} get {len(fetch_res_list)}"
+            conn.close()
+            assert len_fetch_expected == len(fetch_res_list), f"count of results is not valid, expected to {len_fetch_expected} get {len(fetch_res_list)}"
 
 
 import grpc
