@@ -1,7 +1,7 @@
 
 from pysqream_blue.logger import *
 import grpc
-from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages
+from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages, __version__
 import time
 import socket
 from pysqream_blue.utils import is_token_expired
@@ -142,8 +142,7 @@ class Connection:
         session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
             tenant_id=self.tenant_id,
             database=self.database,
-            source_ip=socket.gethostbyname(socket.gethostname()),
-            client_info=cl_messages.ClientInfo(version='PySQream2_V_111'),
+            client_info=cl_messages.ClientInfo(version=f"pysqream-blue_V{__version__}"),
             pool_name=self.pool_name
         ), credentials=grpc.access_token_call_credentials(self.token))
         return session_response
