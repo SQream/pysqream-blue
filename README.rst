@@ -3,7 +3,7 @@
 Python connector for SQream DB Blue
 ===================================
 
-* **Version:**  1.0.35
+* **Version:**  1.0.36
 
 * **Supported SQream DB versions:** >= Blue cloud
 
