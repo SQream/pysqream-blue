@@ -9,8 +9,8 @@ from pysqream_blue.logger import *
 
 # os.environ['export GRPC_POLL_STRATEGY'] = 'poll'
 os.environ['export GRPC_ENABLE_FORK_SUPPORT'] = 'false'
-os.environ['export GRPC_VERBOSITY'] = 'DEBUG'
-os.environ['export GRPC_TRACE'] = 'all'
+# os.environ['export GRPC_VERBOSITY'] = 'DEBUG'
+# os.environ['export GRPC_TRACE'] = 'all'
 
 
 def connect(host:      str,
