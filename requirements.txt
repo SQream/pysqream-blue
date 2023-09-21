@@ -4,3 +4,4 @@ setuptools==65.5.1
 grpcio==1.53.0
 grpcio-tools==1.47.0
 numpy>=1.20
+python-dotenv==1.0.0
