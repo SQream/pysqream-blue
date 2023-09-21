@@ -3,12 +3,9 @@
 import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
-import os
 from pysqream_blue.logger import *
-from dotenv import load_dotenv
 # from pysqream_blue.connection import qh_messages
 
-load_dotenv()
 
 def connect(host:      str,
             port:      str =  '443',
