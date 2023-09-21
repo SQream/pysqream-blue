@@ -1,5 +1,7 @@
 
 from pysqream_blue.logger import *
+from dotenv import load_dotenv
+load_dotenv()
 import grpc
 from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages, __version__
 import time
