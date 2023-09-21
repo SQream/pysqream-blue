@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 import grpc
 from pysqream_blue.globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter
 import time
