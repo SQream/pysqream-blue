@@ -13,8 +13,9 @@ from pysqream_blue.casting import *
 
 class Cursor:
 
-    def __init__(self, client, context_id, query_timeout, call_credentialds, use_ssl):
+    def __init__(self, client, context_id, query_timeout, call_credentialds, use_ssl, channel):
 
+        self.channel = channel
         self.client = client
         self.context_id = context_id
         self.query_timeout = query_timeout

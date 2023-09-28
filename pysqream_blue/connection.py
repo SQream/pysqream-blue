@@ -226,6 +226,6 @@ class Connection:
             but different session (authentication / token)"""
 
         self._verify_open()
-        cur = Cursor(self.client, self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl)
+        cur = Cursor(self.client, self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl, self.channel)
         self.cursors.append(cur)
         return cur
