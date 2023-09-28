@@ -136,12 +136,17 @@ class Cursor:
             log_and_raise(ProgrammingError, f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
 
     def _compile(self, query):
-        log_info(f"Compile Query {query}")
+
+        log_info("Check channel ready")
+        computation = grpc.channel_ready_future(self.channel).result(timeout=15)
+        log_info(f"Computation is {computation}")
+
+        log_info(f"Compile query {query}")
         response: qh_messages.CompileResponse = self.client.Compile(
             qh_messages.CompileRequest(context_id=self.context_id, sql=query.encode('utf8'), encoding='utf8',
                                        query_timeout=self.query_timeout),
             credentials=self.call_credentialds if self.use_ssl else None)
-        log_info("Done Compilation")
+        log_info(f"Done compilation for statement id {response.context_id}")
         self.stmt_id, self.columns_metadata, self.query_type = response.context_id, response.columns, response.query_type
         return response
 
