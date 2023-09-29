@@ -13,7 +13,8 @@ from pysqream_blue.casting import *
 
 class Cursor:
 
-    def __init__(self, client, context_id, query_timeout, call_credentialds, use_ssl, channel, logs):
+    def __init__(self, client, context_id, query_timeout, call_credentialds, use_ssl, channel,
+                 logs, start_log, log_path, log_level):
 
         self.channel = channel
         self.client = client
@@ -28,6 +29,12 @@ class Cursor:
         self.stmt_id = None
         self.rowcount = -1
         self.arraysize = 1
+
+        if len(self.logs.logger.handlers) == 0 and start_log:
+            self.logs.set_log_path(log_path=log_path)
+            self.logs.set_level(log_level)
+            self.logs.start_logging(log_level=log_level)
+
 
     def execute(self, query: str, params=None):
         ''' Execute a statement. Parameters are not supported '''

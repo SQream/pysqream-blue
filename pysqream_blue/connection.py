@@ -27,6 +27,9 @@ class Connection:
         self.query_timeout = query_timeout
         self.pool_name = pool_name
         self.logs = logs
+        self.log_path = self.logs.log_path
+        self.start_log = self.logs.start
+        self.log_level = self.logs.level
 
         self.is_base_connection = is_base_connection
         if is_base_connection:
@@ -82,7 +85,7 @@ class Connection:
                 """close channel only in the base connection because cursors use the same channel from base"""
                 self.channel.close()
         except grpc.RpcError as rpc_error:
-            self.logs.log(f'Error from grpc while attempting to disconnect from server.\n{rpc_error}', self.logs.error)
+            self.logs.message(f'Error from grpc while attempting to disconnect from server.\n{rpc_error}', self.logs.error)
             return
 
         self.connected = False
@@ -192,6 +195,7 @@ class Connection:
 
         self.session_opened = False
         self.channel.close()
+        self.logs.stop_logging()
         self.logs.message(f'Connection closed to database {self.database}.', self.logs.info)
 
     def _close(self):
@@ -227,6 +231,6 @@ class Connection:
 
         self._verify_open()
         cur = Cursor(self.client, self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl,
-                     self.channel, self.logs)
+                     self.channel, self.logs, self.start_log, self.log_path, self.log_level)
         self.cursors.append(cur)
         return cur

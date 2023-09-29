@@ -22,12 +22,14 @@ def connect(host:      str,
             reconnect_attempts : int = 10,
             reconnect_interval : int = 3,
             query_timeout      : int = 0,
-            pool_name: str = None
+            pool_name: str = None,
+            log_level: str = logs.info
             ) -> Connection:
     ''' Connect to SQream database '''
 
     if log:
-        logs.start_logging(level=logs.info)
+        logs.set_level(log_level)
+        logs.start_logging()
 
     conn = Connection(host, port, logs, use_ssl=use_ssl, is_base_connection=True, reconnect_attempts=reconnect_attempts,
                       reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
