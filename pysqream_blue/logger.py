@@ -8,6 +8,7 @@ class Logs:
     def __init__(self):
         self.logger = logging.getLogger("dbapi_logger")
         self.log_path = '/var/log/sqream_dbapi.log'
+        # self.log_path = '/Users/danielg/sqream_dbapi.log'
         self.logger.disabled = True
         self.info = logging.INFO
         self.error = logging.ERROR
@@ -15,7 +16,7 @@ class Logs:
         self.warning = logging.WARNING
 
     def __del__(self):
-        self.start_logging()
+        self.stop_logging()
 
     def set_log_path(self, log_path=None):
         log_path = log_path if log_path else self.log_path

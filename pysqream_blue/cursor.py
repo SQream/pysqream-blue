@@ -144,7 +144,7 @@ class Cursor:
         response: qh_messages.CompileResponse = self.client.Compile(
             qh_messages.CompileRequest(context_id=self.context_id, sql=query.encode('utf8'), encoding='utf8',
                                        query_timeout=self.query_timeout),
-            credentials=self.call_credentialds if self.use_ssl else None)
+            credentials=self.call_credentialds if self.use_ssl else None, wait_for_ready=True)
         self.logs.message(f"Done compilation for statement id {response.context_id}", self.logs.info)
         self.stmt_id, self.columns_metadata, self.query_type = response.context_id, response.columns, response.query_type
         return response
