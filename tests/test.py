@@ -125,6 +125,15 @@ class TestBaseWithoutBeforeAfter():
         yield
 
 
+class TestDebug(TestBase):
+
+    def test_debug(self):
+        res1 = self.query.fetch("select 1")
+        res2 = self.query.fetch("select 2")
+        print(res1)
+        print(res2)
+
+
 class TestConnection(TestBaseWithoutBeforeAfter):
 
     def test_connection(self):

@@ -4,8 +4,10 @@ import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
 import os
-from pysqream_blue.logger import *
+from pysqream_blue.logger import Logs
 # from pysqream_blue.connection import qh_messages
+
+logs = Logs()
 
 
 def connect(host:      str,
@@ -25,10 +27,10 @@ def connect(host:      str,
             ) -> Connection:
     ''' Connect to SQream database '''
 
-    if log is not False:
-        start_logging(None if log is True else log)
+    if log:
+        logs.start_logging(log_path=None if log is True else log, level=logs.info)
 
-    conn = Connection(host, port, use_ssl, log=log, is_base_connection=True, reconnect_attempts=reconnect_attempts,
+    conn = Connection(host, port, logs, use_ssl=use_ssl, is_base_connection=True, reconnect_attempts=reconnect_attempts,
                       reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
     conn.connect_database(database, username, password, tenant_id, service, access_token)
 
