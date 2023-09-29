@@ -33,8 +33,7 @@ class Cursor:
         if len(self.logs.logger.handlers) == 0 and start_log:
             self.logs.set_log_path(log_path=log_path)
             self.logs.set_level(log_level)
-            self.logs.start_logging(log_level=log_level)
-
+            self.logs.start_logging()
 
     def execute(self, query: str, params=None):
         ''' Execute a statement. Parameters are not supported '''
