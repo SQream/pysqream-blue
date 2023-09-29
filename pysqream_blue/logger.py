@@ -7,6 +7,7 @@ class Logs:
 
     def __init__(self):
         self.logger = logging.getLogger("dbapi_logger")
+        self.log_path = '/var/log/sqream_dbapi.log'
         self.logger.disabled = True
         self.info = logging.INFO
         self.error = logging.ERROR
@@ -16,17 +17,19 @@ class Logs:
     def __del__(self):
         self.start_logging()
 
-    def start_logging(self, log_path=None, level=logging.INFO):
-        log_path = log_path or '/var/log/sqream_dbapi.log'
-        self.logger.disabled = False
+    def set_log_path(self, log_path=None):
+        log_path = log_path if log_path else self.log_path
         try:
-            handler = logging.FileHandler(log_path)
+            self.handler = logging.FileHandler(log_path)
         except Exception as e:
-            raise Exception(f"Bad log path was given, please verify path is valid and no forbidden characters were used {e}")
+            raise Exception(
+                f"Bad log path was given, please verify path is valid and no forbidden characters were used {e}")
 
-        handler.setLevel(level)
-        handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-        self.logger.addHandler(handler)
+    def start_logging(self, level=logging.INFO):
+        self.logger.disabled = False
+        self.handler.setLevel(level)
+        self.handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        self.logger.addHandler(self.handler)
 
         return self.logger
 

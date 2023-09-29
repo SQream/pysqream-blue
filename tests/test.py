@@ -49,7 +49,7 @@ neg_test_vals = {'tinyint': (258, 3.6, 'test',  (1997, 5, 9), (1997, 12, 12, 10,
 
 def connect_pysqream_blue(domain, use_ssl=True):
     return pysqream_blue.connect(host=domain, use_ssl=use_ssl,
-                                 access_token=_access_token)
+                                 access_token=_access_token, log=True)
 
 
 class Query():
@@ -128,6 +128,20 @@ class TestBaseWithoutBeforeAfter():
 class TestDebug(TestBase):
 
     def test_debug(self):
+        # con = connect_pysqream_blue(self.domain, use_ssl=False)
+        # cur = con.cursor()
+        # cur.execute("select 1")
+        # res1 = cur.fetchall()
+        # cur.close()
+        # con.close()
+        #
+        # con2 = connect_pysqream_blue(self.domain, use_ssl=False)
+        # cur = con2.cursor()
+        # cur.execute("select 2")
+        # res2 = cur.fetchall()
+        # cur.close()
+        # con2.close()
+
         res1 = self.query.fetch("select 1")
         res2 = self.query.fetch("select 2")
         print(res1)

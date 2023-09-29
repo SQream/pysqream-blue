@@ -3,17 +3,16 @@
 import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
-import os
 from pysqream_blue.logger import Logs
-# from pysqream_blue.connection import qh_messages
 
 logs = Logs()
+logs.set_log_path()
 
 
 def connect(host:      str,
             port:      str =  '443',
             use_ssl:   bool = True,
-            log              = True,
+            log:       bool = True,
             database:  str =  'master',
             username:  str =  'sqream',
             password:  str =  'sqream',
@@ -28,7 +27,7 @@ def connect(host:      str,
     ''' Connect to SQream database '''
 
     if log:
-        logs.start_logging(log_path=None if log is True else log, level=logs.info)
+        logs.start_logging(level=logs.info)
 
     conn = Connection(host, port, logs, use_ssl=use_ssl, is_base_connection=True, reconnect_attempts=reconnect_attempts,
                       reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
@@ -36,6 +35,9 @@ def connect(host:      str,
 
     return conn
 
+
+def set_log_path(log_path):
+    logs.set_log_path(log_path)
 
 
 ## DBapi compatibility
@@ -88,23 +90,3 @@ apilevel = '2.0'
 threadsafety = 1 # Threads can share the module but not a connection
 
 paramstyle = 'qmark'
-
-
-# if __name__ == '__main__':
-#     con = connect(host='4_52.isqream.com', database='master')
-#     query = None
-#     while (True):
-#         cursor = con.cursor()
-#         query = input(f'{con.database}=> ')
-#         if '\q' == query:
-#             break
-#         try:
-#             cursor.execute(query)
-#             if cursor.query_type == qh_messages.QUERY_TYPE_QUERY:
-#                 print(*(desc[0] for desc in cursor.description), sep=', ')
-#                 print(*cursor.fetchall() or [], sep="\n")
-#                 print(f'{cursor.rowcount} rows')
-#                 cursor.close()
-#         except Exception as e:
-#             print(e)
-#     con.close()
