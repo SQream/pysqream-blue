@@ -146,7 +146,6 @@ class Cursor:
 
     def _compile(self, query):
 
-        grpc.aio.Channel.channel_ready(self.channel)
         self.logs.message(f"Compile query {query}", self.logs.info)
         response: qh_messages.CompileResponse = self.client.Compile(
             qh_messages.CompileRequest(context_id=self.context_id, sql=query.encode('utf8'), encoding='utf8',

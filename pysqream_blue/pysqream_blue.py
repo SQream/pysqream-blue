@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import os
+os.environ['GRPC_TRACE'] = 'all'
+os.environ['GRPC_VERBOSITY'] = 'DEBUG'
 import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection

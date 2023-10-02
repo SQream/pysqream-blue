@@ -48,12 +48,12 @@ class Connection:
         try_connect_num = 0
         while True:
             try:
-                options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3)
-                           # ('grpc.keepalive_time_ms', 1000), ('grpc.keepalive_timeout_ms', 2000),
-                           # ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True)
+                options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
+                           ('grpc.keepalive_time_ms', 1000), ('grpc.keepalive_timeout_ms', 2000),
+                           ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True),
+                           ("grpc.enable_http_proxy", 0)
                            ]
                 if self.use_ssl:
-                    # options.append(("grpc.enable_http_proxy", 0))
                     self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
                                                        options=options)
                 else:
