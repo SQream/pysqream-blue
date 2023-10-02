@@ -49,7 +49,7 @@ class Connection:
         while True:
             try:
                 options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
-                           ('grpc.keepalive_time_ms', 1000), ('grpc.keepalive_timeout_ms', 2000),
+                           ('grpc.keepalive_time_ms', 10), ('grpc.keepalive_timeout_ms', 20),
                            ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True),
                            ("grpc.enable_http_proxy", 0)
                            ]
