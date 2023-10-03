@@ -30,6 +30,11 @@ class Connection:
         self.log_path = self.logs.log_path
         self.start_log = self.logs.start
         self.log_level = self.logs.level
+        self.options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
+                           ('grpc.keepalive_time_ms', 500), ('grpc.keepalive_timeout_ms', 500),
+                           ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True),
+                           ("grpc.enable_http_proxy", 0)
+                           ]
 
         self.is_base_connection = is_base_connection
         if is_base_connection:
@@ -48,16 +53,11 @@ class Connection:
         try_connect_num = 0
         while True:
             try:
-                options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
-                           ('grpc.keepalive_time_ms', 500), ('grpc.keepalive_timeout_ms', 500),
-                           ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True),
-                           ("grpc.enable_http_proxy", 0)
-                           ]
                 if self.use_ssl:
                     self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
-                                                       options=options)
+                                                       options=self.options)
                 else:
-                    self.channel = grpc.insecure_channel(f'{self.host}:{self.port}', options=options)
+                    self.channel = grpc.insecure_channel(f'{self.host}:{self.port}', options=self.options)
                 self.auth_stub = auth_services.AuthenticationServiceStub(self.channel)
                 self.client    = qh_services.QueryHandlerServiceStub(self.channel)
                 break
@@ -230,7 +230,7 @@ class Connection:
             but different session (authentication / token)"""
 
         self._verify_open()
-        cur = Cursor(self.client, self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl,
-                     self.channel, self.logs, self.start_log, self.log_path, self.log_level)
+        cur = Cursor(self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl,
+                     self.logs, self.start_log, self.log_path, self.log_level,  self.host, self.port, self.options)
         self.cursors.append(cur)
         return cur

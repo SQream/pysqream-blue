@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 import grpc
-from pysqream_blue.globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter
+from pysqream_blue.globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter, qh_services
 import time
 from pysqream_blue.logger import *
 from pysqream_blue.utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
@@ -13,11 +13,9 @@ from pysqream_blue.casting import *
 
 class Cursor:
 
-    def __init__(self, client, context_id, query_timeout, call_credentialds, use_ssl, channel,
-                 logs, start_log, log_path, log_level):
+    def __init__(self, context_id, query_timeout, call_credentialds, use_ssl,
+                 logs, start_log, log_path, log_level, host, port, options):
 
-        self.channel = channel
-        self.client = client
         self.context_id = context_id
         self.query_timeout = query_timeout
         self.call_credentialds = call_credentialds
@@ -29,6 +27,12 @@ class Cursor:
         self.stmt_id = None
         self.rowcount = -1
         self.arraysize = 1
+        self.host = host
+        self.port = port
+        self.options = options
+        self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
+                                           options=self.options)
+        self.client = qh_services.QueryHandlerServiceStub(self.channel)
 
         if len(self.logs.logger.handlers) == 0 and start_log:
             self.logs.set_log_path(log_path=log_path)
@@ -66,15 +70,10 @@ class Cursor:
         except grpc.RpcError as rpc_error:
             self.logs.log_and_raise(ProgrammingError,
                           f'Context id: {self.stmt_id}. Error from grpc while attempting to cancel the query.\n{rpc_error}')
-            if is_token_expired(str(rpc_error)):
-                auth_response = self.client.auth_access_token()
-                self.client.token = auth_response.token
-                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-                cancel_response: qh_messages.CancelResponse = self._cancel()
 
-            if cancel_response.HasField('error'):
-                self.logs.log_and_raise(OperationalError,
-                              f'Context id: {self.stmt_id}. Error while attempting to cancel the query.\n{cancel_response.error}')
+        if cancel_response.HasField('error'):
+            self.logs.log_and_raise(OperationalError,
+                          f'Context id: {self.stmt_id}. Error while attempting to cancel the query.\n{cancel_response.error}')
 
         self.logs.message(f'Context id: {self.stmt_id}. The query was successfully canceled. query type: '
                           f'{self.query_type}.', self.logs.info)
@@ -168,6 +167,7 @@ class Cursor:
         except grpc.RpcError as rpc_error:
             self.logs.log_and_raise(ProgrammingError,
                           f'Query id: {self.stmt_id}. Error from grpc while attempting to execute the query.\n{rpc_error}')
+            self.channel.close()
 
     def _execute(self):
         return self.client.Execute(
@@ -205,6 +205,7 @@ class Cursor:
             except grpc.RpcError as rpc_error:
                 self.logs.log_and_raise(ProgrammingError,
                               f'Query id: {self.stmt_id}. Error from grpc while attempting to get query status.\n{rpc_error}')
+                self.channel.close()
 
     def _status(self):
         return self.client.Status(
@@ -247,6 +248,7 @@ class Cursor:
                 retry = False
                 self.logs.log_and_raise(ProgrammingError,
                               f'Query id: {self.stmt_id}. Error from grpc while attempting to fetch the results.\n{rpc_error}')
+                self.channel.close()
 
         if fetch_response.HasField('error'):
             self.logs.log_and_raise(OperationalError,
@@ -361,6 +363,7 @@ class Cursor:
 
             self.more_to_fetch = False
             self.statement_opened = False
+            self.channel.close()
 
     def _close(self):
         return self.client.CloseStatement(
