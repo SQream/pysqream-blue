@@ -28,6 +28,7 @@ class Logs:
         self.logger = logging.getLogger("dbapi_logger")
         # self.log_path = None
         self.log_path = '/var/log/sqream_dbapi.log'
+        # self.log_path = '/Users/danielg/sqream_dbapi.log'
         self.logger.disabled = True
         self.level = None
         self.info = logging.INFO

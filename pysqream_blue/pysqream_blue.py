@@ -9,6 +9,7 @@ from pysqream_blue.connection import Connection
 from pysqream_blue.logger import Logs, log_level_str_to_enum
 
 logs = Logs()
+logs.set_log_path()
 
 
 def connect(host:      str,
