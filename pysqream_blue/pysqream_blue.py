@@ -15,7 +15,7 @@ logs.set_log_path()
 def connect(host:      str,
             port:      str =  '443',
             use_ssl:   bool = True,
-            use_logs:   bool = True,
+            use_logs:  bool = True,
             database:  str =  'master',
             username:  str =  'sqream',
             password:  str =  'sqream',
@@ -26,7 +26,7 @@ def connect(host:      str,
             reconnect_interval : int = 3,
             query_timeout      : int = 0,
             pool_name: str = None,
-            log_level: str = 'DEBUG'
+            log_level: str = 'INFO'
             ) -> Connection:
     ''' Connect to SQream database '''
 
@@ -39,10 +39,10 @@ def connect(host:      str,
             raise ValueError(f"Please choose the correct log level = [{log_level_str_to_enum.keys()}]")
 
         logs.set_level(log_level_str_to_enum[log_level.upper()])
-        logs.start_logging()
 
     conn = Connection(host, port, logs, use_ssl=use_ssl, is_base_connection=True, reconnect_attempts=reconnect_attempts,
-                      reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
+                      reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name,
+                      use_logs=use_logs)
     conn.connect_database(database, username, password, tenant_id, service, access_token)
 
     return conn

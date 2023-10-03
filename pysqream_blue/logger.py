@@ -54,7 +54,8 @@ class Logs:
             raise Exception(
                 f"Bad log path was given, please verify path is valid and no forbidden characters were used {e}")
 
-    def start_logging(self):
+    def start_logging(self, module_name):
+        self.logger = logging.getLogger(module_name)
         self.logger.disabled = False
         logging.addLevelName(self.level.value, self.level.name)
         self.file_handler.setLevel(self.level.value)
@@ -76,6 +77,7 @@ class Logs:
 
         raise exception_type(error_msg)
 
-    def message(self, message: str, level: [logging.INFO, logging.DEBUG, logging.WARNING, logging.ERROR]):
+    def message(self, message: str, level: [logging.INFO, logging.DEBUG, logging.WARNING, logging.ERROR,
+                                            logging.CRITICAL]):
         if self.logger.isEnabledFor(level):
-            self.logger.info(message)
+            self.logger.log(level, message)

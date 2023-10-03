@@ -37,7 +37,7 @@ class Cursor:
         if len(self.logs.logger.handlers) == 0 and start_log:
             self.logs.set_log_path(log_path=log_path)
             self.logs.set_level(log_level)
-            self.logs.start_logging()
+            self.logs.start_logging(__name__)
 
     def __del__(self):
         self.channel.close()
