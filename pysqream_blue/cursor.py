@@ -39,6 +39,9 @@ class Cursor:
             self.logs.set_level(log_level)
             self.logs.start_logging()
 
+    def __del__(self):
+        self.channel.close()
+
     def execute(self, query: str, params=None):
         ''' Execute a statement. Parameters are not supported '''
 
@@ -47,7 +50,7 @@ class Cursor:
             self.logs.log_and_raise(NotSupportedError, "Parametered queries currently not supported.")
         # if self.statement_opened:
         #     self.close()
-
+        self.logs.message("DANIEL!!!!!", self.logs.debug)
         self._request_compile(query)
         self.statement_opened = True
         self._request_execute()

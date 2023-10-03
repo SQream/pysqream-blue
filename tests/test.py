@@ -47,9 +47,11 @@ neg_test_vals = {'tinyint': (258, 3.6, 'test',  (1997, 5, 9), (1997, 12, 12, 10,
                  'nvarchar': (5, 3.6, (1, 2), (1997, 12, 12, 10, 10, 10), False, True)}
 
 
-def connect_pysqream_blue(domain, use_ssl=True):
+def connect_pysqream_blue(domain, use_ssl=True, use_logs=False, log_path=None, log_level='INFO'):
+    if use_logs:
+        pysqream_blue.set_log_path(log_path)
     return pysqream_blue.connect(host=domain, use_ssl=use_ssl,
-                                 access_token=_access_token, log=True)
+                                 access_token=_access_token, use_logs=use_logs, log_level=log_level)
 
 
 class Query():
@@ -90,12 +92,24 @@ class TestBase():
     def domain(self, pytestconfig):
         return pytestconfig.getoption("domain")
 
+    @pytest.fixture()
+    def log_path(self, pytestconfig):
+        return pytestconfig.getoption("log_path", default=None)
+
+    @pytest.fixture()
+    def use_logs(self, pytestconfig):
+        return pytestconfig.getoption("use_logs", default=False)
+
+    @pytest.fixture()
+    def log_level(self, pytestconfig):
+        return pytestconfig.getoption("log_level", default='INFO')
+
     @pytest.fixture(autouse=True)
-    def Test_setup_teardown(self, domain):
+    def Test_setup_teardown(self, domain, use_logs, log_path, log_level):
         self.domain = domain
         Logger().info("Before Scenario")
         Logger().info(f"Connect to server with domain {domain}")
-        self.con = connect_pysqream_blue(domain)
+        self.con = connect_pysqream_blue(domain, use_logs=use_logs, log_path=log_path, log_level=log_level)
         self.query = Query(self.con)
         yield
         Logger().info("After Scenario")

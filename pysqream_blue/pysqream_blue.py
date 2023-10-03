@@ -6,16 +6,15 @@
 import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
-from pysqream_blue.logger import Logs
+from pysqream_blue.logger import Logs, log_level_str_to_enum
 
 logs = Logs()
-logs.set_log_path()
 
 
 def connect(host:      str,
             port:      str =  '443',
             use_ssl:   bool = True,
-            log:       bool = True,
+            use_logs:   bool = True,
             database:  str =  'master',
             username:  str =  'sqream',
             password:  str =  'sqream',
@@ -26,16 +25,19 @@ def connect(host:      str,
             reconnect_interval : int = 3,
             query_timeout      : int = 0,
             pool_name: str = None,
-            log_level: str = logs.info
+            log_level: str = 'DEBUG'
             ) -> Connection:
     ''' Connect to SQream database '''
 
-    if log:
+    if use_logs:
         if logs.log_path is None:
             raise ValueError("Please set log path to save the log using pysqream_blue.set_log_path('PATH') before "
                              "connecting to DB")
 
-        logs.set_level(log_level)
+        if log_level.upper() not in log_level_str_to_enum.keys():
+            raise ValueError(f"Please choose the correct log level = [{log_level_str_to_enum.keys()}]")
+
+        logs.set_level(log_level_str_to_enum[log_level.upper()])
         logs.start_logging()
 
     conn = Connection(host, port, logs, use_ssl=use_ssl, is_base_connection=True, reconnect_attempts=reconnect_attempts,

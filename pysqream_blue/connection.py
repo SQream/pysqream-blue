@@ -43,7 +43,8 @@ class Connection:
 
     def __del__(self):
         self._disconnect_server()
-        self.logs.stop_logging()
+        if self.logs.start:
+            self.logs.stop_logging()
 
     def _connect_to_server(self):
         ''' open grpc chanel and stubs '''
@@ -166,7 +167,8 @@ class Connection:
 
     def close_connection(self):
         self.close()
-        self.logs.stop_logging()
+        if self.logs.start:
+            self.logs.stop_logging()
 
     def close(self):
         """Disconnect from database. the connection to the server remains open."""
@@ -195,7 +197,8 @@ class Connection:
 
         self.session_opened = False
         self.channel.close()
-        self.logs.stop_logging()
+        if self.logs.start:
+            self.logs.stop_logging()
         self.logs.message(f'Connection closed to database {self.database}.', self.logs.info)
 
     def _close(self):
