@@ -14,7 +14,7 @@ from pysqream_blue.casting import *
 class Cursor:
 
     def __init__(self, context_id, query_timeout, call_credentialds, use_ssl,
-                 logs, start_log, log_path, log_level, host, port, options):
+                 logs, log_path, log_level, host, port, options):
 
         self.context_id = context_id
         self.query_timeout = query_timeout
@@ -34,7 +34,7 @@ class Cursor:
                                            options=self.options)
         self.client = qh_services.QueryHandlerServiceStub(self.channel)
 
-        if len(self.logs.logger.handlers) == 0 and start_log:
+        if len(self.logs.logger.handlers) == 0 and self.logs.start:
             self.logs.set_log_path(log_path=log_path)
             self.logs.set_level(log_level)
             self.logs.start_logging(__name__)

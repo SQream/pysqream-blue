@@ -24,8 +24,8 @@ log_level_str_to_enum = {
 
 class Logs:
 
-    def __init__(self):
-        self.logger = logging.getLogger("dbapi_logger")
+    def __init__(self, module_name):
+        self.logger = logging.getLogger(module_name)
         self.log_path = None
         # self.log_path = '/var/log/sqream_dbapi.log'
         # self.log_path = '/Users/danielg/sqream_dbapi.log'
@@ -65,9 +65,10 @@ class Logs:
         return self.logger
 
     def stop_logging(self):
-        self.logger.handlers = []
         self.logger.disabled = True
-        self.file_handler.close()
+        self.logger.handlers = []
+        if self.file_handler:
+            self.file_handler.close()
 
     def log_and_raise(self, exception_type: [NotSupportedError, ProgrammingError, InternalError,
                                        IntegrityError, OperationalError, DataError,

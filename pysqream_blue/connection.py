@@ -26,12 +26,13 @@ class Connection:
         self.statement_opened = False
         self.query_timeout = query_timeout
         self.pool_name = pool_name
+        self.logs = logs
+        self.log_path = self.logs.log_path
+        self.start_log = self.logs.start
+        self.log_level = self.logs.level
         if use_logs:
-            self.logs = logs
             self.logs.start_logging(__name__)
-            self.log_path = self.logs.log_path
-            self.start_log = self.logs.start
-            self.log_level = self.logs.level
+
         self.options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
                            ('grpc.keepalive_time_ms', 500), ('grpc.keepalive_timeout_ms', 500),
                            ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True),
@@ -237,6 +238,6 @@ class Connection:
         self._verify_open()
         self.logs.stop_logging()
         cur = Cursor(self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl,
-                     self.logs, self.start_log, self.log_path, self.log_level,  self.host, self.port, self.options)
+                     self.logs, self.log_path, self.log_level,  self.host, self.port, self.options)
         self.cursors.append(cur)
         return cur

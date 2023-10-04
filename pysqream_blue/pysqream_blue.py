@@ -8,7 +8,7 @@ from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
 from pysqream_blue.logger import Logs, log_level_str_to_enum
 
-logs = Logs()
+logs = Logs(__name__)
 
 
 def connect(host:      str,
