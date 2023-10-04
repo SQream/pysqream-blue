@@ -3,7 +3,7 @@
 Python connector for SQream DB Blue
 ===================================
 
-* **Version:**  1.0.40
+* **Version:**  1.0.41
 
 * **Supported SQream DB versions:** >= Blue cloud
 
@@ -128,15 +128,17 @@ To enable logging, pass a path to a log file in the connection string as follows
 
 .. code-block:: python
 
-   con = pysqream_blue.connect('127.0.0.1', '80', log = '/path/to/logfile.xx')
+   pysqream_blue.set_log_path('PATH LOG FILE')
+   con = pysqream_blue.connect('127.0.0.1', '80', use_logs=True, log_level='INFO')
 
-Or pass True to save to `'/tmp/sqream_dbapi.log'`:
+For example save to `'/tmp/sqream_dbapi.log'`:
 
 .. code-block:: python
 
-   con = pysqream_blue.connect('127.0.0.1', '80', log =True)
+   pysqream_blue.set_log_path('/tmp/sqream_dbapi.log')
+   con = pysqream_blue.connect('127.0.0.1', '80', use_logs=True, log_level='INFO')
 
-
+The log level default is 'INFO', the logs level are ['INFO', 'DEBUG', 'CRITICAL', 'WARNING', 'ERROR']
 
 TODO (when server support):
 -----------------------------------------

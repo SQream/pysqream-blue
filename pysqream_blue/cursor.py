@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 import grpc
-from pysqream_blue.globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter
+from pysqream_blue.globals import qh_messages, dbapi_typecodes, type_to_v1_tpye, type_to_letter, qh_services
 import time
 from pysqream_blue.logger import *
 from pysqream_blue.utils import NotSupportedError, ProgrammingError, InternalError, IntegrityError, OperationalError, DataError, \
@@ -13,12 +13,13 @@ from pysqream_blue.casting import *
 
 class Cursor:
 
-    def __init__(self, client, context_id, query_timeout, call_credentialds, use_ssl):
+    def __init__(self, context_id, query_timeout, call_credentialds, use_ssl,
+                 logs, log_path, log_level, host, port, options):
 
-        self.client = client
         self.context_id = context_id
         self.query_timeout = query_timeout
         self.call_credentialds = call_credentialds
+        self.logs = logs
         self.use_ssl = use_ssl
         self.more_to_fetch = False
         self.statement_opened = False
@@ -26,16 +27,30 @@ class Cursor:
         self.stmt_id = None
         self.rowcount = -1
         self.arraysize = 1
+        self.host = host
+        self.port = port
+        self.options = options
+        self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
+                                           options=self.options)
+        self.client = qh_services.QueryHandlerServiceStub(self.channel)
+
+        if len(self.logs.logger.handlers) == 0 and self.logs.start:
+            self.logs.set_log_path(log_path=log_path)
+            self.logs.set_level(log_level)
+            self.logs.start_logging(__name__)
+
+    def __del__(self):
+        self.channel.close()
 
     def execute(self, query: str, params=None):
         ''' Execute a statement. Parameters are not supported '''
 
         # self._verify_open()
         if params:
-            log_and_raise(NotSupportedError, "Parametered queries currently not supported.")
+            self.logs.log_and_raise(NotSupportedError, "Parametered queries currently not supported.")
         # if self.statement_opened:
         #     self.close()
-
+        self.logs.message("DANIEL!!!!!", self.logs.debug)
         self._request_compile(query)
         self.statement_opened = True
         self._request_execute()
@@ -50,25 +65,21 @@ class Cursor:
     def _request_cancel(self):
 
         if self.stmt_id is None:
-            log_and_raise(ProgrammingError, "Context Id is not found")
+            self.logs.log_and_raise(ProgrammingError, "Context Id is not found")
 
         cancel_response = None
         try:
             cancel_response: qh_messages.CancelResponse = self._cancel()
         except grpc.RpcError as rpc_error:
-            log_and_raise(ProgrammingError,
+            self.logs.log_and_raise(ProgrammingError,
                           f'Context id: {self.stmt_id}. Error from grpc while attempting to cancel the query.\n{rpc_error}')
-            if is_token_expired(str(rpc_error)):
-                auth_response = self.client.auth_access_token()
-                self.client.token = auth_response.token
-                self.call_credentialds = grpc.access_token_call_credentials(self.client.token)
-                cancel_response: qh_messages.CancelResponse = self._cancel()
 
-            if cancel_response.HasField('error'):
-                log_and_raise(OperationalError,
-                              f'Context id: {self.stmt_id}. Error while attempting to cancel the query.\n{cancel_response.error}')
+        if cancel_response.HasField('error'):
+            self.logs.log_and_raise(OperationalError,
+                          f'Context id: {self.stmt_id}. Error while attempting to cancel the query.\n{cancel_response.error}')
 
-        log_info(f'Context id: {self.stmt_id}. The query was successfully canceled. query type: {self.query_type}.')
+        self.logs.message(f'Context id: {self.stmt_id}. The query was successfully canceled. query type: '
+                          f'{self.query_type}.', self.logs.info)
         return cancel_response
 
     def _cancel(self):
@@ -79,15 +90,15 @@ class Cursor:
         if not params:
             return self.execute(query)
         if not isinstance(params, Sequence) or not isinstance(params[0], Sequence):
-            log_and_raise(ProgrammingError,
+            self.logs.log_and_raise(ProgrammingError,
                           f'Params to executemany() should be a sequence of sequence, got {type(params)}')
-        log_and_raise(NotSupportedError, "Parametered queries currently not supported.")
+        self.logs.log_and_raise(NotSupportedError, "Parametered queries currently not supported.")
 
     def fetchmany(self, size):
         size = size or self.arraysize
         # self._verify_open()
         if not self.statement_opened or self.query_type not in (None, qh_messages.QUERY_TYPE_QUERY):
-            log_and_raise(ProgrammingError, 'No open statement while attempting fetch operation')
+            self.logs.log_and_raise(ProgrammingError, 'No open statement while attempting fetch operation')
 
         while (size > len(self.parsed_rows) or size == -1) and self.more_to_fetch:
             self._request_fetch()
@@ -105,7 +116,7 @@ class Cursor:
         ''' Fetch one result row '''
 
         if bad_args:
-            log_and_raise(ProgrammingError, "Bad argument to fetchone()")
+            self.logs.log_and_raise(ProgrammingError, "Bad argument to fetchone()")
 
         res = self.fetchmany(1)
         return None if not res else res
@@ -114,7 +125,7 @@ class Cursor:
         ''' Fetch all result rows '''
 
         if bad_args:
-            log_and_raise(ProgrammingError, "Bad argument to fetchall()")
+            self.logs.log_and_raise(ProgrammingError, "Bad argument to fetchall()")
 
         return self.fetchmany(-1)
 
@@ -126,19 +137,23 @@ class Cursor:
             response: qh_messages.CompileResponse = self._compile(query)
 
             if response.HasField('error'):
-                log_and_raise(OperationalError,
+                self.logs.log_and_raise(OperationalError,
                               f'Query: {query}. Error while attempting to compile the query.\n{response.error}')
 
-            log_info(f'Query id: {self.stmt_id}. The query was successfully compiled. query type: {self.query_type}.')
+            self.logs.message(f'Query id: {self.stmt_id}. The query was successfully compiled. query type: '
+                              f'{self.query_type}.', self.logs.info)
 
         except grpc.RpcError as rpc_error:
-            log_and_raise(ProgrammingError, f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
+            self.logs.log_and_raise(ProgrammingError, f'Query: {query}. Error from grpc while attempting to compile the query.\n{rpc_error}')
 
     def _compile(self, query):
+
+        self.logs.message(f"Compile query {query}", self.logs.info)
         response: qh_messages.CompileResponse = self.client.Compile(
             qh_messages.CompileRequest(context_id=self.context_id, sql=query.encode('utf8'), encoding='utf8',
                                        query_timeout=self.query_timeout),
-            credentials=self.call_credentialds if self.use_ssl else None)
+            credentials=self.call_credentialds if self.use_ssl else None, wait_for_ready=True)
+        self.logs.message(f"Done compilation for statement id {response.context_id}", self.logs.info)
         self.stmt_id, self.columns_metadata, self.query_type = response.context_id, response.columns, response.query_type
         return response
 
@@ -147,14 +162,15 @@ class Cursor:
             execute_response: qh_messages.ExecuteResponse = self._execute()
 
             if execute_response.HasField('error'):
-                log_and_raise(OperationalError,
+                self.logs.log_and_raise(OperationalError,
                               f'Query id: {self.stmt_id}. Error while attempting to execute the query.\n{execute_response.error}')
 
-            log_info(f'Query id: {self.stmt_id}. The query was send to execute successfully.')
+            self.logs.message(f'Query id: {self.stmt_id}. The query was send to execute successfully.', self.logs.info)
 
         except grpc.RpcError as rpc_error:
-            log_and_raise(ProgrammingError,
+            self.logs.log_and_raise(ProgrammingError,
                           f'Query id: {self.stmt_id}. Error from grpc while attempting to execute the query.\n{rpc_error}')
+            self.channel.close()
 
     def _execute(self):
         return self.client.Execute(
@@ -163,34 +179,36 @@ class Cursor:
 
     def _request_status(self):
 
-        log_info(f'Query id: {self.stmt_id}. Wait for execution.')
+        self.logs.message(f'Query id: {self.stmt_id}. Wait for execution.', self.logs.info)
         self.try_status_num = 0
         while True:
             try:
                 status_response: qh_messages.StatusResponse = self._status()
 
                 if status_response.HasField('error'):
-                    log_and_raise(OperationalError,
+                    self.logs.log_and_raise(OperationalError,
                                   f'Query id: {self.stmt_id}. Error while attempting to get query status.\n{status_response.error}')
 
                 if status_response.status == qh_messages.QUERY_EXECUTION_STATUS_ABORTED:
-                    log_info(f"Query id {self.stmt_id} is aborted")
+                    self.logs.message(f"Query id {self.stmt_id} is aborted", self.logs.info)
                     return
 
                 elif status_response.status != qh_messages.QUERY_EXECUTION_STATUS_RUNNING and \
                         status_response.status != qh_messages.QUERY_EXECUTION_STATUS_QUEUED:
                     self.stmt_status = status_response.status
-                    log_info(
-                        f'Query id: {self.stmt_id}. status: {qh_messages.QueryExecutionStatus.Name(self.stmt_status)}.')
+                    self.logs.message(
+                        f'Query id: {self.stmt_id}. status: '
+                        f'{qh_messages.QueryExecutionStatus.Name(self.stmt_status)}.', self.logs.info)
                     if self.stmt_status != qh_messages.QUERY_EXECUTION_STATUS_SUCCEEDED:
-                        log_and_raise(OperationalError,
+                        self.logs.log_and_raise(OperationalError,
                                       f"Query id: {self.stmt_id}. Query execution failed with status: {qh_messages.QueryExecutionStatus.Name(self.stmt_status)}.")
                     return
                 self._smart_sleep()
 
             except grpc.RpcError as rpc_error:
-                log_and_raise(ProgrammingError,
+                self.logs.log_and_raise(ProgrammingError,
                               f'Query id: {self.stmt_id}. Error from grpc while attempting to get query status.\n{rpc_error}')
+                self.channel.close()
 
     def _status(self):
         return self.client.Status(
@@ -205,7 +223,7 @@ class Cursor:
         if self.query_type == qh_messages.QUERY_TYPE_NON_QUERY:
             return
         elif self.query_type != qh_messages.QUERY_TYPE_QUERY:
-            log_and_raise(OperationalError, "Query id: {self.stmt_id}. Query type {self.query_type} is not supported")
+            self.logs.log_and_raise(OperationalError, "Query id: {self.stmt_id}. Query type {self.query_type} is not supported")
 
         self.more_to_fetch = True
         self.parsed_rows = []
@@ -231,11 +249,12 @@ class Cursor:
                 retry = fetch_response.retry_fetch
             except grpc.RpcError as rpc_error:
                 retry = False
-                log_and_raise(ProgrammingError,
+                self.logs.log_and_raise(ProgrammingError,
                               f'Query id: {self.stmt_id}. Error from grpc while attempting to fetch the results.\n{rpc_error}')
+                self.channel.close()
 
         if fetch_response.HasField('error'):
-            log_and_raise(OperationalError,
+            self.logs.log_and_raise(OperationalError,
                           f'Query id: {self.stmt_id}. Error while attempting to fetch the results.\n{fetch_response.error}')
 
         res_bytes = fetch_response.query_result
@@ -254,7 +273,7 @@ class Cursor:
         if not self.unparsed_row_amount:
             self.more_to_fetch = False
 
-        log_info(f'Query id: {self.stmt_id}, {self.unparsed_row_amount} rows fetched.')
+        self.logs.message(f'Query id: {self.stmt_id}, {self.unparsed_row_amount} rows fetched.', self.logs.info)
 
     def _fetch(self):
         return self.client.Fetch(
@@ -321,20 +340,22 @@ class Cursor:
             self.parsed_rows.append(tuple(row))
 
         self.data_columns = []
-        log_info(f'Query id: {self.stmt_id}, {self.parsed_row_amount} rows parsed.')
+        self.logs.message(f'Query id: {self.stmt_id}, {self.parsed_row_amount} rows parsed.', self.logs.info)
         self.parsed_row_amount = 0
 
     def close(self):
         try:
             response: qh_messages.CloseResponse = self._close()
             if response.HasField('error'):
-                log_warning(f'Query id: {self.stmt_id}. Error while attempting to close the query.\n{response.error}')
+                self.logs.message(f'Query id: {self.stmt_id}. '
+                                  f'Error while attempting to close the query.\n{response.error}', self.logs.warning)
                 return
 
-            log_info(f'Query id: {self.stmt_id}. The query was close successfully.')
+            self.logs.message(f'Query id: {self.stmt_id}. The query was close successfully.', self.logs.info)
 
         except grpc.RpcError as rpc_error:
-            log_error(f'Query id: {self.stmt_id}. Error from grpc while attempting to close the query.\n{rpc_error}')
+            self.logs.message(f'Query id: {self.stmt_id}. '
+                              f'Error from grpc while attempting to close the query.\n{rpc_error}', self.logs.error)
         finally:
             self.query_type = None
             self.parsed_rows = None
@@ -345,6 +366,7 @@ class Cursor:
 
             self.more_to_fetch = False
             self.statement_opened = False
+            self.channel.close()
 
     def _close(self):
         return self.client.CloseStatement(

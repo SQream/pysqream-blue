@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 
+# import os
+# os.environ['GRPC_TRACE'] = 'all'
+# os.environ['GRPC_VERBOSITY'] = 'DEBUG'
 import time
 from datetime import datetime, date, time as t
 from pysqream_blue.connection import Connection
-import os
-from pysqream_blue.logger import *
-# from pysqream_blue.connection import qh_messages
+from pysqream_blue.logger import Logs, log_level_str_to_enum
+
+logs = Logs(__name__)
 
 
 def connect(host:      str,
             port:      str =  '443',
             use_ssl:   bool = True,
-            log              = False,
+            use_logs:  bool = False,
             database:  str =  'master',
             username:  str =  'sqream',
             password:  str =  'sqream',
@@ -21,19 +24,31 @@ def connect(host:      str,
             reconnect_attempts : int = 10,
             reconnect_interval : int = 3,
             query_timeout      : int = 0,
-            pool_name: str = None
+            pool_name: str = None,
+            log_level: str = 'INFO'
             ) -> Connection:
     ''' Connect to SQream database '''
 
-    if log is not False:
-        start_logging(None if log is True else log)
+    if use_logs:
+        if logs.log_path is None:
+            raise ValueError("Please set log path to save the log using pysqream_blue.set_log_path('PATH') before "
+                             "connecting to DB")
 
-    conn = Connection(host, port, use_ssl, log=log, is_base_connection=True, reconnect_attempts=reconnect_attempts,
-                      reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name)
+        if log_level.upper() not in log_level_str_to_enum.keys():
+            raise ValueError(f"Please choose the correct log level = [{log_level_str_to_enum.keys()}]")
+
+        logs.set_level(log_level_str_to_enum[log_level.upper()])
+
+    conn = Connection(host, port, logs, use_ssl=use_ssl, is_base_connection=True, reconnect_attempts=reconnect_attempts,
+                      reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name,
+                      use_logs=use_logs)
     conn.connect_database(database, username, password, tenant_id, service, access_token)
 
     return conn
 
+
+def set_log_path(log_path):
+    logs.set_log_path(log_path)
 
 
 ## DBapi compatibility
@@ -86,23 +101,3 @@ apilevel = '2.0'
 threadsafety = 1 # Threads can share the module but not a connection
 
 paramstyle = 'qmark'
-
-
-# if __name__ == '__main__':
-#     con = connect(host='4_52.isqream.com', database='master')
-#     query = None
-#     while (True):
-#         cursor = con.cursor()
-#         query = input(f'{con.database}=> ')
-#         if '\q' == query:
-#             break
-#         try:
-#             cursor.execute(query)
-#             if cursor.query_type == qh_messages.QUERY_TYPE_QUERY:
-#                 print(*(desc[0] for desc in cursor.description), sep=', ')
-#                 print(*cursor.fetchall() or [], sep="\n")
-#                 print(f'{cursor.rowcount} rows')
-#                 cursor.close()
-#         except Exception as e:
-#             print(e)
-#     con.close()
