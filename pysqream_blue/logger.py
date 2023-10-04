@@ -27,8 +27,6 @@ class Logs:
     def __init__(self, module_name):
         self.logger = logging.getLogger(module_name)
         self.log_path = None
-        # self.log_path = '/var/log/sqream_dbapi.log'
-        # self.log_path = '/Users/danielg/sqream_dbapi.log'
         self.logger.disabled = True
         self.level = None
         self.info = logging.INFO
@@ -56,6 +54,7 @@ class Logs:
 
     def start_logging(self, module_name):
         self.logger = logging.getLogger(module_name)
+        self.logger.setLevel(self.level.value)
         self.logger.disabled = False
         logging.addLevelName(self.level.value, self.level.name)
         self.file_handler.setLevel(self.level.value)
