@@ -14,7 +14,7 @@ logs = Logs(__name__)
 def connect(host:      str,
             port:      str =  '443',
             use_ssl:   bool = True,
-            use_logs:  bool = True,
+            use_logs:  bool = False,
             database:  str =  'master',
             username:  str =  'sqream',
             password:  str =  'sqream',
