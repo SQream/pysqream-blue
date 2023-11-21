@@ -25,7 +25,8 @@ def connect(host:      str,
             reconnect_interval : int = 3,
             query_timeout      : int = 0,
             pool_name: str = None,
-            log_level: str = 'INFO'
+            log_level: str = 'INFO',
+            source_type: str = "EXTERNAL"
             ) -> Connection:
     ''' Connect to SQream database '''
 
@@ -41,7 +42,7 @@ def connect(host:      str,
 
     conn = Connection(host, port, logs, use_ssl=use_ssl, is_base_connection=True, reconnect_attempts=reconnect_attempts,
                       reconnect_interval=reconnect_interval, query_timeout=query_timeout, pool_name=pool_name,
-                      use_logs=use_logs)
+                      use_logs=use_logs, source_type=source_type)
     conn.connect_database(database, username, password, tenant_id, service, access_token)
 
     return conn
