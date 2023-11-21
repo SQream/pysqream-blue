@@ -26,7 +26,7 @@ def connect(host:      str,
             query_timeout      : int = 0,
             pool_name: str = None,
             log_level: str = 'INFO',
-            source_type: str = 'EXTERNAL'
+            source_type: str = "EXTERNAL"
             ) -> Connection:
     ''' Connect to SQream database '''
 

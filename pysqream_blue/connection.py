@@ -15,7 +15,7 @@ class Connection:
 
     def __init__(self, host: str, port: str, logs: Logs, use_ssl: bool = True, is_base_connection: bool = True,
                  reconnect_attempts : int = 10, reconnect_interval : int = 3, query_timeout: int = 0,
-                 pool_name: str = None, use_logs=False, source_type="EXTERNAL"):
+                 pool_name: str = None, use_logs=False, source_type=cl_messages.SourceType.Value("EXTERNAL")):
         self.host, self.port, self.use_ssl = host, port, use_ssl
         # Product want to connect with SSL
         self.use_ssl = True
@@ -30,6 +30,9 @@ class Connection:
         self.log_path = self.logs.log_path
         self.start_log = self.logs.start
         self.log_level = self.logs.level
+        if(source_type not in cl_messages.SourceType.keys()):
+            self.logs.log_and_raise(ProgrammingError,
+                                    f"The source type must be one from the list: {cl_messages.SourceType.keys()}")
         self.source_type = source_type
         if use_logs:
             self.logs.start_logging(__name__)
@@ -152,7 +155,7 @@ class Connection:
             tenant_id=self.tenant_id,
             database=self.database,
             client_info=cl_messages.ClientInfo(version=f"pysqream-blue_V{__version__}",
-                                               source_type=cl_messages.SourceType(self.source_type)),
+                                               source_type=cl_messages.SourceType.Value(self.source_type)),
             pool_name=self.pool_name
         ), credentials=grpc.access_token_call_credentials(self.token))
         return session_response
