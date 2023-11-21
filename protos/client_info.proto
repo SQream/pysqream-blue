@@ -4,4 +4,17 @@ package com.sqream.cloud.generated.v1;
 
 option java_multiple_files = true;
 
-message ClientInfo { string version = 1; }
+message ClientInfo {
+  string version = 1;
+  SourceType source_type = 2;
+}
+
+enum SourceType {
+  UNSPECIFIED = 0;
+  BLUE_UI_SYSTEM = 1;
+  BLUE_UI_USER = 2;
+  CLI = 3;
+  JOBS = 4;
+  STATISTICS = 5;
+  EXTERNAL = 6;
+}
