@@ -15,7 +15,7 @@ class Connection:
 
     def __init__(self, host: str, port: str, logs: Logs, use_ssl: bool = True, is_base_connection: bool = True,
                  reconnect_attempts : int = 10, reconnect_interval : int = 3, query_timeout: int = 0,
-                 pool_name: str = None, use_logs=False, source_type=cl_messages.SourceType.Value("EXTERNAL")):
+                 pool_name: str = None, use_logs=False, source_type="EXTERNAL"):
         self.host, self.port, self.use_ssl = host, port, use_ssl
         # Product want to connect with SSL
         self.use_ssl = True
