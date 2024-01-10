@@ -154,6 +154,7 @@ class Connection:
         session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
             tenant_id=self.tenant_id,
             database=self.database,
+            source_ip=self.get_source_ip(),
             client_info=cl_messages.ClientInfo(version=f"pysqream-blue_V{__version__}",
                                                source_type=cl_messages.SourceType.Value(self.source_type)),
             pool_name=self.pool_name
@@ -246,3 +247,8 @@ class Connection:
                      self.logs, self.log_path, self.log_level,  self.host, self.port, self.options)
         self.cursors.append(cur)
         return cur
+
+    def get_source_ip(self):
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        return ip_address
