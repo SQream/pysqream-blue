@@ -6,6 +6,7 @@ import grpc
 from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages, __version__
 import time
 import socket
+import os
 from pysqream_blue.utils import is_token_expired
 from pysqream_blue.cursor import Cursor
 
@@ -249,6 +250,6 @@ class Connection:
         return cur
 
     def get_source_ip(self):
-        hostname = socket.gethostname()
+        hostname = os.uname()[1]
         ip_address = socket.gethostbyname(hostname)
         return ip_address
