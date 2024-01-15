@@ -250,6 +250,10 @@ class Connection:
         return cur
 
     def get_source_ip(self):
-        hostname = os.uname()[1]
-        ip_address = socket.gethostbyname(hostname)
+        try:
+            hostname = socket.gethostname()
+            ip_address = socket.gethostbyname(hostname)
+        except socket.gaierror as e:
+            print(f"Error getting IP address: {e}")
+            ip_address = "127.0.0.1"
         return ip_address
