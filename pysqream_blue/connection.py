@@ -6,6 +6,7 @@ import grpc
 from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages, __version__
 import time
 import socket
+import os
 from pysqream_blue.utils import is_token_expired
 from pysqream_blue.cursor import Cursor
 
@@ -154,6 +155,7 @@ class Connection:
         session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
             tenant_id=self.tenant_id,
             database=self.database,
+            source_ip=self.get_source_ip(),
             client_info=cl_messages.ClientInfo(version=f"pysqream-blue_V{__version__}",
                                                source_type=cl_messages.SourceType.Value(self.source_type)),
             pool_name=self.pool_name
@@ -246,3 +248,12 @@ class Connection:
                      self.logs, self.log_path, self.log_level,  self.host, self.port, self.options)
         self.cursors.append(cur)
         return cur
+
+    def get_source_ip(self):
+        try:
+            hostname = socket.gethostname()
+            ip_address = socket.gethostbyname(hostname)
+        except socket.gaierror as e:
+            print(f"Error getting IP address: {e}")
+            ip_address = "127.0.0.1"
+        return ip_address
