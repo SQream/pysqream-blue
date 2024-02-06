@@ -9,7 +9,7 @@ from pysqream_blue.utils import NotSupportedError, ProgrammingError, InternalErr
 from collections.abc import Sequence
 import json
 from pysqream_blue.casting import *
-
+import array_parser
 
 class Cursor:
 
@@ -280,6 +280,7 @@ class Cursor:
                 qh_messages.FetchRequest(context_id=self.stmt_id),
                 credentials=self.call_credentialds if self.use_ssl else None)
 
+   #TODO!! add array
     def _parse(self):
         if not self.unparsed_row_amount:
             return
@@ -287,13 +288,19 @@ class Cursor:
         self.data_columns = []
         for column_meta in self.columns_metadata:
             column = []
+            is_array = column_meta.type == qh_messages.COLUMN_TYPE_ARRAY
+
             if column_meta.nullable:
                 column.append(self.unsorted_data_columns.pop(0).cast('?'))
-            if column_meta.tru_varchar:
+            if is_array:
+                column.append(self.unsorted_data_columns.pop(0).cast('i'))
+            elif column_meta.tru_varchar:
                 column.append(self.unsorted_data_columns.pop(0).cast('i'))
             if type_to_letter[column_meta.type] == 's':
                 column.append(self.unsorted_data_columns.pop(0).tobytes())
                 column.append(0)
+            elif is_array:
+                column.append(self.unsorted_data_columns.pop(0))
             else:
                 column.append(self.unsorted_data_columns.pop(0).cast(type_to_letter[column_meta.type]))
 
@@ -317,6 +324,13 @@ class Cursor:
             for col_meta, col_data in zip(self.columns_metadata, self.data_columns):
                 if col_meta.nullable and col_data[0][i]:
                     row.append(None)
+                elif col_meta.type == qh_messages.COLUMN_TYPE_ARRAY:
+                    buffer_len = col_data[1][i] if col_meta.nullable else col_data[0][i]
+                    data_buffer = col_data[-1]
+                    array_object = array_parser.convert_buffer_to_array(
+                        col_meta.sub_type, col_meta.scale, buffer_len, data_buffer[0:buffer_len])
+                    row.append(array_object)
+                    col_data[-1] += buffer_len
                 elif col_meta.tru_varchar:
                     size = col_data[1][i] if col_meta.nullable else col_data[0][i]
                     start_byte = add_and_return(size)
