@@ -1,38 +1,39 @@
 import struct
 from typing import List, Any
 
-from pysqream_blue import NotSupportedError
 from pysqream_blue.globals import qh_messages, type_to_letter, dbapi_typecodes
 import casting
 from pysqream_blue.logger import Logs
 from pysqream_blue.utils import NotSupportedError
 
 logs = Logs(__name__)
-def _convert_fixed_size_buffer_to_array(buffer, sub_type, scale, buffer_len) -> List[List[Any]]:
+
+
+def _convert_fixed_size_buffer_to_array(buffer: memoryview, buffer_len: int, sub_type: qh_messages, scale: int) -> List[
+    Any]:
     """Extract array with data of fixed size
 
-    Extract array from binary data of an Array with types of fixed
+     convert binary data to an array with fixed
     size (BOOL, TINYINT, SMALLINT, INT, BIGINT, REAL, DOUBLE,
-    NUMERIC, DATE, DATETIME). But not with TEXT
+    NUMERIC, DATE, DATETIME) objects (not with TEXT)
 
-    Raw data contains binary data of nulls at each index in array
-    and data separated by optional padding (trailing zeros at the
+    Raw data contains binary data of data separated by optional padding (trailing zeros at the
     end for portions of data whose lengths are not dividable by 8)
 
-    Example for binary data for 1 row of boolean array[true, null,
+    Example for binary data of boolean array[true, null,
     false]:
     `010 00000 100` -> replace paddings with _ `010_____100` where
     `010` are flag of null data inside array. Then `00000` is a
     padding to make lengths of data about nulls to be dividable by 8
     in case of array of length 8, 16, 24, 32 ... there won't be a
-    padding then `100` is a binary representation of 3 boolean
+    padding, then `100` is a binary representation of 3 boolean
     values itself
 
     Returns:
-        A list with Arrays of data. Array represented as python
+        A list with fixed size data. Array represented as python
         lists also.
 
-        [[1, 5, 7], None, [31, 2, None, 6]]
+        [true, null, false]
     """
     data_fixed_size = struct.calcsize(type_to_letter[sub_type])
     array_size = _get_array_size(data_fixed_size, buffer_len)
@@ -46,17 +47,18 @@ def _convert_fixed_size_buffer_to_array(buffer, sub_type, scale, buffer_len) -> 
         for i in range(array_size)
     ]
 
+
 def _get_array_size(data_size: int, buffer_length: int) -> int:
     """Get the SQream ARRAY size by inner data size and buffer length
 
     Args:
-        data_size: integer with the size of data inside ARRAY, for
+        data_size: integer with the size of data (fixed size data) inside ARRAY, for
           example for INT is 4, for BOOL is 1, etc.
         buffer_length: length of a chunk of buffer connected with one
           array
 
     Returns:
-        An integer representing size of an ARRAY with fixed sized data
+        An integer representing number of elements of an ARRAY with fixed sized data
     """
     aligned_block_size = (data_size + 1) * 8  # data + 1 byte for null
     div, mod = divmod(buffer_length, aligned_block_size)
@@ -66,18 +68,19 @@ def _get_array_size(data_size: int, buffer_length: int) -> int:
     return size
 
 
-def _arr_lengths_to_pairs(self, text_lengths):
+def _arr_lengths_to_pairs(text_lengths: List[int]):
     """Generator for parsing ARRAY TEXT columns' data"""
     start = 0
     for length in text_lengths:
         yield start, length
-        start = length + self._padding(length)
+        start = length + _padding(length)
 
 
-def _padding(number):
+def _padding(number: int):
     return (8 - number % 8) % 8
 
-def _get_unfixed_size_array(data: memoryview, nulls: memoryview, dlen: memoryview):
+
+def _get_unfixed_size_array(data: memoryview, nulls: List[bool], dlen: List[int]):
     """Construct one single array from data with dlen right bounds"""
     arr = []
     # lengths_to_pairs is not appropriate due to differences
@@ -90,7 +93,7 @@ def _get_unfixed_size_array(data: memoryview, nulls: memoryview, dlen: memoryvie
     return arr
 
 
-def _convert_unfixed_size_buffer_to_array(buffer, buffer_len):
+def _convert_unfixed_size_buffer_to_array(buffer: memoryview, buffer_len: int) -> List[List[Any]]:
     """Extract array with data of unfixed size
 
      Extract array from binary data of an Array with types of TEXT
@@ -130,14 +133,14 @@ def _convert_unfixed_size_buffer_to_array(buffer, buffer_len):
          buffer_len: the size of the chunk
 
      Returns:
-         A list with Arrays of data. Array represented as python
+         A list with Strings. Array represented as python
          lists also.
 
-         [["ABC", "ABCDEF", None], None, ["A", None, ""]]
+         ["ABC", "ABCDEF", None]
      """
-    num_of_elements = buffer[:8].cast('q')[0]  #Long
+    num_of_elements = buffer[:8].cast('q')[0]  # Long
     cur = 8 + num_of_elements + _padding(num_of_elements)
-    #data lengths
+    # data lengths
     d_len = buffer[cur:cur + num_of_elements * 4].cast('i')
     cur += (num_of_elements + num_of_elements % 2) * 4
     data = buffer[cur: buffer_len]
@@ -145,47 +148,45 @@ def _convert_unfixed_size_buffer_to_array(buffer, buffer_len):
     return _get_unfixed_size_array(data, nulls, d_len)
 
 
-def convert_buffer_to_array(sub_type, scale, buffer_len, data_buffer):
+def _get_trasform_func(type: qh_messages, scale: int) -> callable:
+    """Provide function for casting bytes data to real data
+
+    Args:
+        type: type of an object
+        scale: this parameter is relevant just for numeric type
+
+    Returns:
+        A function that cast simple portion of data to appropriate
+        value.
+    """
+    data_format = type_to_letter[type]
+    wrappers = {
+        qh_messages.COLUMN_TYPE_DATE: casting.sq_date_to_py_date,
+        qh_messages.COLUMN_TYPE_DATETIME: casting.sq_datetime_to_py_datetime
+    }
+
+    if type == qh_messages.COLUMN_TYPE_NUMERIC:
+        def cast(data):
+            return casting.sq_numeric_to_decimal(data, scale)
+    elif type in wrappers:
+        def cast(data):
+            return wrappers[type](data.cast(data_format)[0])
+    else:
+        def cast(data):
+            return data.cast(data_format)[0]
+
+    def transform(mem: memoryview, is_null: bool = False):
+        return None if is_null else cast(mem)
+
+    return transform
+
+
+def convert_buffer_to_array(buffer: memoryview, buffer_len: int, sub_type: qh_messages, scale: int) -> List[List[Any]]:
     sub_type_code = dbapi_typecodes.get(sub_type)
     if sub_type_code == "STRING":
-        return _convert_unfixed_size_buffer_to_array(data_buffer, buffer_len)
+        return _convert_unfixed_size_buffer_to_array(buffer, buffer_len)
     if sub_type_code not in ("NUMBER", "DATETIME"):
-            logs.log_and_raise(
-                 NotSupportedError,
-                f'Array of "{sub_type}" is not supported',
-            )
-    return _convert_fixed_size_buffer_to_array(data_buffer, sub_type, scale, buffer_len)
-
-
- def _get_trasform_func(sub_type, scale) -> callable:
-        """Provide function for casting bytes data to real data
-
-        Args:
-            sub_type: type of each object in the array
-            scale: relevant just for numeric type
-
-        Returns:
-            A function that cast simple portion of data to appropriate
-            value.
-        """
-
-        data_format = type_to_letter[sub_type]
-        wrappers = {
-            qh_messages.COLUMN_TYPE_DATE: casting.sq_date_to_py_date,
-            qh_messages.COLUMN_TYPE_DATETIME: casting.sq_datetime_to_py_datetime
-        }
-
-        if sub_type == qh_messages.COLUMN_TYPE_NUMERIC:
-            def cast(data):
-                return casting.sq_numeric_to_decimal(data, scale)
-        elif sub_type in wrappers:
-            def cast(data):
-                return wrappers[sub_type](data.cast(data_format)[0])
-        else:
-            def cast(data):
-                return data.cast(data_format)[0]
-
-        def transform(mem: memoryview, is_null: bool = False):
-            return None if is_null else cast(mem)
-        return transform
-
+        logs.log_and_raise(
+            NotSupportedError,
+            f'Array of "{sub_type}" is not supported')
+    return _convert_fixed_size_buffer_to_array(buffer, buffer_len, sub_type, scale)

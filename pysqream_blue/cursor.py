@@ -328,7 +328,7 @@ class Cursor:
                     buffer_len = col_data[1][i] if col_meta.nullable else col_data[0][i]
                     data_buffer = col_data[-1]
                     array_object = array_parser.convert_buffer_to_array(
-                        col_meta.sub_type, col_meta.scale, buffer_len, data_buffer[0:buffer_len])
+                        data_buffer[0:buffer_len], buffer_len, col_meta.sub_type, col_meta.scale)
                     row.append(array_object)
                     col_data[-1] += buffer_len
                 elif col_meta.tru_varchar:
