@@ -280,7 +280,6 @@ class Cursor:
                 qh_messages.FetchRequest(context_id=self.stmt_id),
                 credentials=self.call_credentialds if self.use_ssl else None)
 
-   #TODO!! add array
     def _parse(self):
         if not self.unparsed_row_amount:
             return

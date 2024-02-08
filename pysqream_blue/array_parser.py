@@ -6,9 +6,7 @@ import casting
 from pysqream_blue.logger import Logs
 from pysqream_blue.utils import NotSupportedError
 
-logs = Logs(__name__)
-
-
+#TODO- CHECK ABOUT LOGS!!
 def _convert_fixed_size_buffer_to_array(buffer: memoryview, buffer_len: int, sub_type: qh_messages, scale: int) -> List[
     Any]:
     """Extract array with data of fixed size
