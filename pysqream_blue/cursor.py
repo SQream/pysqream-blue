@@ -288,14 +288,15 @@ class Cursor:
         for column_meta in self.columns_metadata:
             column = []
             is_array = column_meta.type == qh_messages.COLUMN_TYPE_ARRAY
-
             if column_meta.nullable:
                 column.append(self.unsorted_data_columns.pop(0).cast('?'))
             if is_array:
                 column.append(self.unsorted_data_columns.pop(0).cast('i'))
             elif column_meta.tru_varchar:
                 column.append(self.unsorted_data_columns.pop(0).cast('i'))
-            if type_to_letter[column_meta.type] == 's':
+            if column_meta.type in (qh_messages.COLUMN_TYPE_VARCHAR,
+                                    qh_messages.COLUMN_TYPE_NUMERIC,
+                                    qh_messages.COLUMN_TYPE_BLOB):
                 column.append(self.unsorted_data_columns.pop(0).tobytes())
                 column.append(0)
             elif is_array:
@@ -329,7 +330,7 @@ class Cursor:
                     array_object = array_parser.convert_buffer_to_array(
                         data_buffer[0:buffer_len], buffer_len, col_meta.sub_type, col_meta.scale)
                     row.append(array_object)
-                    col_data[-1] += buffer_len
+                    col_data[-1] = col_data[-1][buffer_len:]
                 elif col_meta.tru_varchar:
                     size = col_data[1][i] if col_meta.nullable else col_data[0][i]
                     start_byte = add_and_return(size)
