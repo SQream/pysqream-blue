@@ -35,7 +35,7 @@ class Cursor:
         self.client = qh_services.QueryHandlerServiceStub(self.channel)
 
         if len(self.logs.logger.handlers) == 0 and self.logs.start:
-            self.logs.set_log_path(log_path=log_path)
+            self.logs.set_log_path(log_path='/home/zachik/logs_framework/')
             self.logs.set_level(log_level)
             self.logs.start_logging(__name__)
 

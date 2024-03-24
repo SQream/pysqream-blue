@@ -49,7 +49,8 @@ def connect(host:      str,
 
 
 def set_log_path(log_path):
-    logs.set_log_path(log_path)
+    logs.set_log_path('/home/zachik/logs_framework/')
+    #logs.set_log_path(log_path)
 
 
 ## DBapi compatibility
