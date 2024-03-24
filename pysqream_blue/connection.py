@@ -191,10 +191,15 @@ class Connection:
                 if cursor.statement_opened:
                     cursor.close()
 
-        close_response: qh_messages.CloseResponse = None
+        #close_response: qh_messages.CloseResponse = None
         try:
             self.logs.message('**** Before call to CloseResponse ***')
             close_response: qh_messages.CloseResponse = self._close()
+
+            if close_response.HasField('error'):
+                self.logs.message(f'Error while attempting to close database connection.\n{close_response.error}',
+                                  self.logs.error)
+
         except grpc.RpcError as rpc_error:
             self.logs.message(f'Error from grpc while attempting to close database connection.\n{rpc_error}', self.logs.error)
 
@@ -202,9 +207,13 @@ class Connection:
                 auth_response = self.auth_access_token()
                 self.token = auth_response.token
                 close_response: qh_messages.CloseResponse = self._close()
+                if close_response.HasField('error'):
+                    self.logs.message(f'Error while attempting to close database connection.\n{close_response.error}',
+                                      self.logs.error)
 
-        if close_response.HasField('error'):
-            self.logs.message(f'Error while attempting to close database connection.\n{close_response.error}', self.logs.error)
+        except Exception as e:
+            self.logs.message(f'Error from grpc while attempting to close database connection - general exception.\n{e}',
+                              self.logs.error)
 
         self.session_opened = False
         self.channel.close()
