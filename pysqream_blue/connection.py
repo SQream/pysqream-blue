@@ -212,8 +212,8 @@ class Connection:
                                       self.logs.error)
 
         except Exception as e:
-            self.logs.message(f'Error from grpc while attempting to close database connection - general exception.\n{e}',
-                              self.logs.error)
+            self.logs.message(f'Error from grpc while attempting to close database connection - general exception.\n{e}'
+                              , self.logs.ERROR)
 
         self.session_opened = False
         self.channel.close()
