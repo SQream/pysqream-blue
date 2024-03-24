@@ -31,7 +31,7 @@ def connect(host:      str,
     ''' Connect to SQream database '''
 
     if use_logs:
-        set_log_path('/home/zachik/logs_framework/')
+        set_log_path('/home/zachik/logs_framework/1.log')
         if logs.log_path is None:
             raise ValueError("Please set log path to save the log using pysqream_blue.set_log_path('PATH') before "
                              "connecting to DB")
@@ -50,7 +50,7 @@ def connect(host:      str,
 
 
 def set_log_path(log_path):
-    logs.set_log_path('/home/zachik/logs_framework/')
+    logs.set_log_path('/home/zachik/logs_framework/2.log')
     #logs.set_log_path(log_path)
 
 

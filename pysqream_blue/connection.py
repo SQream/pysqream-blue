@@ -28,7 +28,7 @@ class Connection:
         self.query_timeout = query_timeout
         self.pool_name = pool_name
         self.logs = logs
-        self.log_path = '/home/zachik/logs_framework/'#self.logs.log_path
+        self.log_path = '/home/zachik/logs_framework/3.log'#self.logs.log_path
         self.start_log = self.logs.start
         self.log_level = self.logs.level
         if(source_type not in cl_messages.SourceType.keys()):
@@ -256,7 +256,7 @@ class Connection:
         self.logs.stop_logging()
         cur = Cursor(self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl,
                      #self.logs, self.log_path, self.log_level,  self.host, self.port, self.options)
-                     self.logs, '/home/zachik/logs_framework/', self.log_level, self.host, self.port, self.options)
+                     self.logs, '/home/zachik/logs_framework/4.log', self.log_level, self.host, self.port, self.options)
         self.cursors.append(cur)
         return cur
 
