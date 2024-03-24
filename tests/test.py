@@ -47,7 +47,7 @@ neg_test_vals = {'tinyint': (258, 3.6, 'test',  (1997, 5, 9), (1997, 12, 12, 10,
                  'nvarchar': (5, 3.6, (1, 2), (1997, 12, 12, 10, 10, 10), False, True)}
 
 
-def connect_pysqream_blue(domain, use_ssl=True, use_logs=False, log_path=None, log_level='INFO'):
+def connect_pysqream_blue(domain='zachik.isqream.com', use_ssl=True, use_logs=False, log_path=None, log_level='INFO'):
     if use_logs:
         pysqream_blue.set_log_path(log_path)
     return pysqream_blue.connect(host=domain, use_ssl=use_ssl,
@@ -175,6 +175,13 @@ class TestConnection(TestBaseWithoutBeforeAfter):
             if "SQreamd connection interrupted" not in repr(e):
                 raise Exception("bad error message")
         cur.close()
+        con.close()
+
+
+
+
+
+
         Logger().info("Connection tests - wrong ip")
         try:
             pysqream_blue.connect(host='123.4.5.6', port='443', database='master', username='sqream',
@@ -196,7 +203,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
             pysqream_blue.connect(host=self.domain, port='443', database='wrong_db', username='sqream',
                                   password='sqream', use_ssl=False, access_token=_access_token)
         except Exception as e:
-            if "Database \'wrong_db\' does not exist" not in repr(e).replace("""\\""", ''):
+            if "database \"wrong_db\" does not exist" not in repr(e).replace("""\\""", ''):
                 raise Exception("bad error message")
 
         Logger().info("Connection tests - wrong username")
@@ -222,7 +229,7 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         try:
             cur.execute('select 1')
         except Exception as e:
-          if "Session has been closed" not in repr(e):
+          if "Cannot invoke RPC on closed channel!" not in repr(e):
               raise Exception("bad error message")
 
         Logger().info("Connection tests - Trying to close a connection that is already closed with close()")

@@ -193,6 +193,7 @@ class Connection:
 
         close_response: qh_messages.CloseResponse = None
         try:
+            self.logs.message('**** Before call to CloseResponse ***')
             close_response: qh_messages.CloseResponse = self._close()
         except grpc.RpcError as rpc_error:
             self.logs.message(f'Error from grpc while attempting to close database connection.\n{rpc_error}', self.logs.error)
