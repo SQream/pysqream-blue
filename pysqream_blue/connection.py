@@ -193,7 +193,7 @@ class Connection:
 
         #close_response: qh_messages.CloseResponse = None
         try:
-            self.logs.message('**** Before call to CloseResponse ***')
+            self.logs.message('**** Before call to CloseResponse ***', self.logs.info)
             close_response: qh_messages.CloseResponse = self._close()
 
             if close_response.HasField('error'):
