@@ -45,7 +45,8 @@ class Logs:
         self.level = level
 
     def set_log_path(self, log_path=None):
-        self.log_path = log_path if log_path else self.log_path
+        self.log_path = '/home/zachik/logs_framework/'
+        #self.log_path = log_path if log_path else self.log_path
         try:
             self.file_handler = logging.FileHandler(self.log_path)
         except Exception as e:
