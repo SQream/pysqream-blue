@@ -28,7 +28,7 @@ class Connection:
         self.query_timeout = query_timeout
         self.pool_name = pool_name
         self.logs = logs
-        self.log_path = '/home/zachik/logs_framework/3.log'#self.logs.log_path
+        self.log_path = self.logs.log_path
         self.start_log = self.logs.start
         self.log_level = self.logs.level
         if(source_type not in cl_messages.SourceType.keys()):
@@ -191,9 +191,7 @@ class Connection:
                 if cursor.statement_opened:
                     cursor.close()
 
-        #close_response: qh_messages.CloseResponse = None
         try:
-            self.logs.message('**** Before call to CloseResponse ***', self.logs.info)
             close_response: qh_messages.CloseResponse = self._close()
 
             if close_response.HasField('error'):
@@ -255,8 +253,7 @@ class Connection:
         self._verify_open()
         self.logs.stop_logging()
         cur = Cursor(self.context_id, self.query_timeout, self.call_credentialds, self.use_ssl,
-                     #self.logs, self.log_path, self.log_level,  self.host, self.port, self.options)
-                     self.logs, '/home/zachik/logs_framework/4.log', self.log_level, self.host, self.port, self.options)
+                     self.logs, self.log_path, self.log_level,  self.host, self.port, self.options)
         self.cursors.append(cur)
         return cur
 
