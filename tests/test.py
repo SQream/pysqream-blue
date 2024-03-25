@@ -222,8 +222,8 @@ class TestConnection(TestBaseWithoutBeforeAfter):
         try:
             cur.execute('select 1')
         except Exception as e:
-          if "Session has been closed channel!" not in repr(e):
-              raise Exception("bad error message")
+            if "Session has been closed" not in repr(e):
+                raise Exception("bad error message")
 
         Logger().info("Connection tests - Trying to close a connection that is already closed with close()")
         con = connect_pysqream_blue(self.domain)
