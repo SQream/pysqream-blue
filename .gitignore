@@ -5,3 +5,6 @@ pytest_html_report.html
 output.json
 tests/archive/*
 .idea/
+dist/
+*egg-info/
+build/
