@@ -28,7 +28,8 @@ dbapi_typecodes = {
     qh_messages.COLUMN_TYPE_DATETIME:  'DATETIME',
     qh_messages.COLUMN_TYPE_BOOL:      'NUMBER',
     qh_messages.COLUMN_TYPE_BLOB:      'STRING',
-    qh_messages.COLUMN_TYPE_NUMERIC:   'NUMBER'
+    qh_messages.COLUMN_TYPE_NUMERIC:   'NUMBER',
+    qh_messages.COLUMN_TYPE_ARRAY:     'ARRAY'
 }
 
 type_to_letter = {
@@ -45,7 +46,7 @@ type_to_letter = {
     qh_messages.COLUMN_TYPE_DOUBLE:    'd',
     qh_messages.COLUMN_TYPE_DATE:      'i',
     qh_messages.COLUMN_TYPE_DATETIME:  'q',
-    qh_messages.COLUMN_TYPE_NUMERIC:   's',
+    qh_messages.COLUMN_TYPE_NUMERIC:   '4i',
     qh_messages.COLUMN_TYPE_VARCHAR:   's',
     qh_messages.COLUMN_TYPE_BLOB:      's'
 }
@@ -66,5 +67,6 @@ type_to_v1_tpye = {
     qh_messages.COLUMN_TYPE_DATETIME:  'ftDateTime',
     qh_messages.COLUMN_TYPE_NUMERIC:   'ftNumeric',
     qh_messages.COLUMN_TYPE_VARCHAR:   'ftVarchar',
-    qh_messages.COLUMN_TYPE_BLOB:      'ftBlob'
+    qh_messages.COLUMN_TYPE_BLOB:      'ftBlob',
+    qh_messages.COLUMN_TYPE_ARRAY:     'ftArray'
 }

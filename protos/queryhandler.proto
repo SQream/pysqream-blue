@@ -52,6 +52,7 @@ message ColumnMetadata {
   int64 value_size = 5;
   int32 scale = 6;
   int32 precision = 7;
+  ColumnType sub_type = 8;
 }
 
 message FetchRequest { string context_id = 1; }
@@ -102,6 +103,7 @@ enum ColumnType {
   COLUMN_TYPE_BOOL = 15;
   COLUMN_TYPE_BLOB = 16;
   COLUMN_TYPE_NUMERIC = 17;
+  COLUMN_TYPE_ARRAY = 18;
 }
 
 enum QueryType {
