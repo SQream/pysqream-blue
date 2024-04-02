@@ -38,7 +38,7 @@ class Connection:
             self.logs.start_logging(__name__)
 
         self.options = [('grpc.max_message_length', 1024 ** 3), ('grpc.max_receive_message_length', 1024 ** 3),
-                           ('grpc.keepalive_time_ms', 500), ('grpc.keepalive_timeout_ms', 500),
+                           ('grpc.keepalive_time_ms', 20000), ('grpc.keepalive_timeout_ms', 20000),
                            ('grpc.keepalive_permit_without_calls', True), ('grpc.keepalive_without_calls', True),
                            ("grpc.enable_http_proxy", 0)
                            ]
