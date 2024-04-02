@@ -6,6 +6,7 @@ import grpc
 from pysqream_blue.globals import auth_services, auth_messages, qh_services, qh_messages, cl_messages, auth_type_messages, __version__
 import time
 import socket
+import os
 from pysqream_blue.utils import is_token_expired
 from pysqream_blue.cursor import Cursor
 
@@ -154,6 +155,7 @@ class Connection:
         session_response: auth_messages.SessionResponse = self.auth_stub.Session(auth_messages.SessionRequest(
             tenant_id=self.tenant_id,
             database=self.database,
+            source_ip=self.get_source_ip(),
             client_info=cl_messages.ClientInfo(version=f"pysqream-blue_V{__version__}",
                                                source_type=cl_messages.SourceType.Value(self.source_type)),
             pool_name=self.pool_name
@@ -189,9 +191,13 @@ class Connection:
                 if cursor.statement_opened:
                     cursor.close()
 
-        close_response: qh_messages.CloseResponse = None
         try:
             close_response: qh_messages.CloseResponse = self._close()
+
+            if close_response.HasField('error'):
+                self.logs.message(f'Error while attempting to close database connection.\n{close_response.error}',
+                                  self.logs.error)
+
         except grpc.RpcError as rpc_error:
             self.logs.message(f'Error from grpc while attempting to close database connection.\n{rpc_error}', self.logs.error)
 
@@ -199,9 +205,13 @@ class Connection:
                 auth_response = self.auth_access_token()
                 self.token = auth_response.token
                 close_response: qh_messages.CloseResponse = self._close()
+                if close_response.HasField('error'):
+                    self.logs.message(f'Error while attempting to close database connection.\n{close_response.error}',
+                                      self.logs.error)
 
-        if close_response.HasField('error'):
-            self.logs.message(f'Error while attempting to close database connection.\n{close_response.error}', self.logs.error)
+        except Exception as e:
+            self.logs.message(f'An general error occurred while attempting to close the database connection {e} .\n'
+                              , self.logs.error)
 
         self.session_opened = False
         self.channel.close()
@@ -246,3 +256,12 @@ class Connection:
                      self.logs, self.log_path, self.log_level,  self.host, self.port, self.options)
         self.cursors.append(cur)
         return cur
+
+    def get_source_ip(self):
+        try:
+            hostname = socket.gethostname()
+            ip_address = socket.gethostbyname(hostname)
+        except socket.gaierror as e:
+            print(f"Error getting IP address: {e}")
+            ip_address = "127.0.0.1"
+        return ip_address
