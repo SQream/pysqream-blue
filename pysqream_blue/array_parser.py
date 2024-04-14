@@ -36,7 +36,7 @@ def _convert_fixed_size_buffer_to_array(buffer: memoryview, buffer_len: int, sub
     data_fixed_size = struct.calcsize(type_to_letter[sub_type])
     array_size = _get_array_size(data_fixed_size, buffer_len)
 
-    data = buffer[array_size + _padding(array_size):buffer_len]
+    data = buffer[array_size + padding(array_size):buffer_len]
     nulls = buffer[0:array_size]
 
     transform = _get_trasform_func(sub_type, scale)
@@ -71,10 +71,10 @@ def _arr_lengths_to_pairs(text_lengths: List[int]):
     start = 0
     for length in text_lengths:
         yield start, length
-        start = length + _padding(length)
+        start = length + padding(length)
 
 
-def _padding(number: int):
+def padding(number: int):
     return (8 - number % 8) % 8
 
 
@@ -137,7 +137,7 @@ def _convert_unfixed_size_buffer_to_array(buffer: memoryview, buffer_len: int) -
          ["ABC", "ABCDEF", None]
      """
     num_of_elements = buffer[:8].cast('q')[0]  # Long
-    cur = 8 + num_of_elements + _padding(num_of_elements)
+    cur = 8 + num_of_elements + padding(num_of_elements)
     # data lengths
     d_len = buffer[cur:cur + num_of_elements * 4].cast('i')
     cur += (num_of_elements + num_of_elements % 2) * 4

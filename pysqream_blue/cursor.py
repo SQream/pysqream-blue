@@ -330,7 +330,7 @@ class Cursor:
                     array_object = array_parser.convert_buffer_to_array(
                         data_buffer[0:buffer_len], buffer_len, col_meta.sub_type, col_meta.scale)
                     row.append(array_object)
-                    col_data[-1] = col_data[-1][buffer_len:]
+                    col_data[-1] = col_data[-1][buffer_len + array_parser.padding(buffer_len):]
                 elif col_meta.tru_varchar:
                     size = col_data[1][i] if col_meta.nullable else col_data[0][i]
                     start_byte = add_and_return(size)

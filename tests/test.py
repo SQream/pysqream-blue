@@ -4,7 +4,6 @@ from numpy.random import randint, uniform
 from queue import Queue
 from time import sleep
 import threading, sys, os
-import socket
 import pytest
 from tests.logger import Logger
 import pysqream_blue
@@ -525,6 +524,53 @@ class TestFetch(TestBase):
 
 
 class TestCursor(TestBase):
+    def test_array(self):
+        Logger().info("Cursor tests - test array")
+        vals = [1]
+        self.con.cursor().execute("set developerMode=true").close()
+        #init state
+        self.con.cursor().execute("set allowArrays = true").close()
+        self.con.cursor().execute("create or replace table a(x int[])").close()
+        self.con.cursor().execute("insert into a values (Array[1]),( Array[1,2,3])").close()
+
+        #first test
+        cur = self.con.cursor().execute("select * from a")
+        res1 = cur.fetchall()
+        expected_result = [([1],), ([1, 2, 3],)]
+        if res1 != expected_result:
+            raise Exception("expected to get {}, instead got {}".format(expected_result, res1))
+        Logger().info(res1)
+        cur.close()
+
+        #second test
+        cur = self.con.cursor()
+        cur.execute("select Array['hgjh','jj']")
+        res1 = cur.fetchall()
+        expected_result = [(['hgjh', 'jj'],)]
+        if res1 != expected_result:
+            raise Exception("expected to get {}, instead got {}".format(expected_result, res1))
+        Logger().info(res1)
+        cur.close()
+
+        #third test
+        cur = self.con.cursor()
+        cur.execute("select Array['2024-02-01 01:01:01' :: datetime]")
+        res1 = cur.fetchall()
+        expected_result = [([datetime(2024, 2, 1, 1, 1, 1)],)]
+        if res1 != expected_result:
+            raise Exception("expected to get {}, instead got {}".format(expected_result, res1))
+        Logger().info(res1)
+        cur.close()
+
+        #fourth test
+        cur = self.con.cursor()
+        cur.execute("select Array['2024-02-01' :: date]")
+        res1 = cur.fetchall()
+        expected_result = [([date(2024, 2, 1), ],)]
+        if res1 != expected_result:
+            raise Exception("expected to get {}, instead got {}".format(expected_result, res1))
+        Logger().info(res1)
+        cur.close()
 
     def test_cursor(self):
 
