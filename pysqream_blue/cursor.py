@@ -193,6 +193,14 @@ class Cursor:
                     self.logs.message(f"Query id {self.stmt_id} is aborted", self.logs.info)
                     return
 
+                if status_response.status == qh_messages.QUERY_EXECUTION_STATUS_QUEUE_TIMEOUT:
+                    self.logs.message("Connection query queue timeout expired.", self.logs.info)
+                    return
+
+                if status_response.status == qh_messages.QUERY_EXECUTION_STATUS_QUERY_RUNTIME_TIMEOUT:
+                    self.logs.message("Connection query runtime timeout expired.", self.logs.info)
+                    return
+
                 elif status_response.status != qh_messages.QUERY_EXECUTION_STATUS_RUNNING and \
                         status_response.status != qh_messages.QUERY_EXECUTION_STATUS_QUEUED:
                     self.stmt_status = status_response.status
