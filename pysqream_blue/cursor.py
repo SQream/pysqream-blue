@@ -33,7 +33,7 @@ class Cursor:
         self.channel = grpc.secure_channel(f'{self.host}:{self.port}', grpc.ssl_channel_credentials(),
                                            options=self.options)
         self.client = qh_services.QueryHandlerServiceStub(self.channel)
-
+        print("!!!!########3PRINITNG         TO             SCREEN##########!!!!!")
         if len(self.logs.logger.handlers) == 0 and self.logs.start:
             self.logs.set_log_path(log_path=log_path)
             self.logs.set_level(log_level)
