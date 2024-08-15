@@ -38,7 +38,7 @@ class Cursor:
             self.logs.set_log_path(log_path=log_path)
             self.logs.set_level(log_level)
             self.logs.start_logging(__name__)
-
+            self.logs.message("Version lital-add-logs", self.logs.debug)
     def __del__(self):
         self.channel.close()
 

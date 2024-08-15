@@ -27,7 +27,7 @@ class Logs:
     def __init__(self, module_name):
         self.logger = logging.getLogger(module_name)
         self.log_path = None
-        self.logger.disabled = True
+        self.logger.disabled = False
         self.level = None
         self.info = logging.INFO
         self.error = logging.ERROR
