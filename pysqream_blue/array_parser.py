@@ -136,6 +136,9 @@ def _convert_unfixed_size_buffer_to_array(buffer: memoryview, buffer_len: int) -
 
          ["ABC", "ABCDEF", None]
      """
+    if len(buffer) == 0:
+        return []
+
     num_of_elements = buffer[:8].cast('q')[0]  # Long
     cur = 8 + num_of_elements + padding(num_of_elements)
     # data lengths
